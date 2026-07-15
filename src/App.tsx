@@ -6,6 +6,7 @@ import LessonPlayer from './components/LessonPlayer';
 import Metronome from './components/Metronome';
 import NavigationBar from './components/NavigationBar';
 import ParentDashboard from './components/ParentDashboard';
+import PracticeReminders from './components/PracticeReminders';
 import PracticeTimer from './components/PracticeTimer';
 import ViolinTuner from './components/ViolinTuner';
 import WeeklyChallenges from './components/WeeklyChallenges';
@@ -113,6 +114,7 @@ function App() {
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />} />
         <Route path="/challenges" element={<WeeklyChallenges />} />
+        <Route path="/reminders" element={<PracticeReminders />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <AIChatBot />

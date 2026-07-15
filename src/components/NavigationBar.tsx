@@ -15,6 +15,7 @@ const toolDestinations = [
   { path: '/metronome', label: '🎵 Metronome' },
   { path: '/achievements', label: '🏆 Achievements' },
   { path: '/challenges', label: '🎯 Challenges' },
+  { path: '/reminders', label: '⏰ Reminders' },
   { path: '/parent-dashboard', label: '👨‍👩‍👧 Parent' },
 ];
 
@@ -26,6 +27,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/metronome') return 'Metronome';
   if (pathname === '/achievements') return 'Achievements';
   if (pathname === '/challenges') return 'Weekly Challenges';
+  if (pathname === '/reminders') return 'Practice Reminders';
   if (pathname === '/parent-dashboard') return 'Parent Dashboard';
 
   return primaryDestinations.find(({ path }) => pathname.startsWith(path))?.label

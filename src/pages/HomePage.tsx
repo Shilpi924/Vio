@@ -38,6 +38,10 @@ export default function HomePage() {
     { path: '/challenges', title: 'Weekly Challenges', icon: '🎯', description: 'Complete challenges for rewards', color: 'from-pink-500 to-rose-600' },
   ];
 
+  const reminderTools = [
+    { path: '/reminders', title: 'Practice Reminders', icon: '⏰', description: 'Set practice time reminders', color: 'from-blue-500 to-cyan-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-7xl mx-auto">
@@ -138,6 +142,22 @@ export default function HomePage() {
         <h2 className="text-3xl font-bold text-gray-900 mb-6">Weekly Challenges</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {challengeTools.map((tool) => (
+            <KidFriendlyButton
+              key={tool.path}
+              onClick={() => navigate(tool.path)}
+              icon={tool.icon}
+              color={tool.color}
+              size="large"
+            >
+              {tool.title}
+            </KidFriendlyButton>
+          ))}
+        </div>
+
+        {/* Reminder Tools */}
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Practice Reminders</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {reminderTools.map((tool) => (
             <KidFriendlyButton
               key={tool.path}
               onClick={() => navigate(tool.path)}
