@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSoundEffects } from '../hooks/useSoundEffects';
 
 interface Achievement {
   id: string;
@@ -106,8 +107,14 @@ const getRarityBorder = (rarity: Achievement['rarity']) => {
 
 export default function Achievements() {
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const { playClickSound } = useSoundEffects();
   const unlockedCount = achievements.filter(a => a.unlocked).length;
   const totalCount = achievements.length;
+
+  const handleAchievementClick = (achievement: Achievement) => {
+    playClickSound();
+    setSelectedAchievement(achievement);
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -131,7 +138,7 @@ export default function Achievements() {
         {achievements.map((achievement) => (
           <div
             key={achievement.id}
-            onClick={() => setSelectedAchievement(achievement)}
+            onClick={() => handleAchievementClick(achievement)}
             className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all hover:scale-105 ${
               achievement.unlocked
                 ? `bg-gradient-to-br ${getRarityColor(achievement.rarity)} ${getRarityBorder(achievement.rarity)}`
@@ -159,7 +166,10 @@ export default function Achievements() {
                 {selectedAchievement.icon}
               </div>
               <button
-                onClick={() => setSelectedAchievement(null)}
+                onClick={() => {
+                  playClickSound();
+                  setSelectedAchievement(null);
+                }}
                 className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ✕

@@ -8,6 +8,7 @@ import NavigationBar from './components/NavigationBar';
 import ParentDashboard from './components/ParentDashboard';
 import PracticeTimer from './components/PracticeTimer';
 import ViolinTuner from './components/ViolinTuner';
+import WeeklyChallenges from './components/WeeklyChallenges';
 import { sampleLessons } from './data/lessons';
 import { completeLesson } from './features/lessons/application/completeLesson';
 import { useCloudSync } from './hooks/useCloudSync';
@@ -111,6 +112,7 @@ function App() {
         <Route path="/metronome" element={<Metronome />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />} />
+        <Route path="/challenges" element={<WeeklyChallenges />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <AIChatBot />
