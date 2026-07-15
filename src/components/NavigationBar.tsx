@@ -9,9 +9,20 @@ const primaryDestinations = [
   { path: '/statistics', label: 'Progress' },
 ];
 
+const toolDestinations = [
+  { path: '/tuner', label: '🎻 Tuner' },
+  { path: '/timer', label: '⏱️ Timer' },
+  { path: '/metronome', label: '🎵 Metronome' },
+  { path: '/achievements', label: '🏆 Achievements' },
+];
+
 function getPageTitle(pathname: string): string {
   if (pathname === '/') return 'Dashboard';
   if (pathname.startsWith('/lessons')) return 'Lessons';
+  if (pathname === '/tuner') return 'Violin Tuner';
+  if (pathname === '/timer') return 'Practice Timer';
+  if (pathname === '/metronome') return 'Metronome';
+  if (pathname === '/achievements') return 'Achievements';
 
   return primaryDestinations.find(({ path }) => pathname.startsWith(path))?.label
     ?? (pathname === '/settings' ? 'Settings' : 'Violin Mentor');
@@ -52,6 +63,20 @@ export default function NavigationBar() {
               onClick={() => navigate(path)}
               className={`px-3 py-2 rounded-lg text-sm transition-colors ${
                 location.pathname.startsWith(path)
+                  ? 'bg-purple-100 text-purple-800'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+          <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          {toolDestinations.map(({ path, label }) => (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                location.pathname === path
                   ? 'bg-purple-100 text-purple-800'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}

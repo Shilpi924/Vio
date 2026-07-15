@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import Achievements from './components/Achievements';
 import AIChatBot from './components/AIChatBot';
 import LessonPlayer from './components/LessonPlayer';
+import Metronome from './components/Metronome';
 import NavigationBar from './components/NavigationBar';
+import PracticeTimer from './components/PracticeTimer';
+import ViolinTuner from './components/ViolinTuner';
 import { sampleLessons } from './data/lessons';
 import { completeLesson } from './features/lessons/application/completeLesson';
 import { useCloudSync } from './hooks/useCloudSync';
@@ -101,6 +105,10 @@ function App() {
         <Route path="/song-upload" element={<SongUploadPage />} />
         <Route path="/lesson-creator" element={<LessonCreatorPage />} />
         <Route path="/rhythm-training" element={<RhythmTrainingPage />} />
+        <Route path="/tuner" element={<ViolinTuner />} />
+        <Route path="/timer" element={<PracticeTimer />} />
+        <Route path="/metronome" element={<Metronome />} />
+        <Route path="/achievements" element={<Achievements />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <AIChatBot />
