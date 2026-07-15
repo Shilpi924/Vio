@@ -8,6 +8,7 @@ import NavigationBar from './components/NavigationBar';
 import ParentDashboard from './components/ParentDashboard';
 import PracticeReminders from './components/PracticeReminders';
 import PracticeTimer from './components/PracticeTimer';
+import SlowPlayback from './components/SlowPlayback';
 import ViolinTuner from './components/ViolinTuner';
 import WeeklyChallenges from './components/WeeklyChallenges';
 import { sampleLessons } from './data/lessons';
@@ -111,6 +112,7 @@ function App() {
         <Route path="/tuner" element={<ViolinTuner />} />
         <Route path="/timer" element={<PracticeTimer />} />
         <Route path="/metronome" element={<Metronome />} />
+        <Route path="/slow-playback" element={<SlowPlayback />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />} />
         <Route path="/challenges" element={<WeeklyChallenges />} />

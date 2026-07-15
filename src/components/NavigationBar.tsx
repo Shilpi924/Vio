@@ -13,6 +13,7 @@ const toolDestinations = [
   { path: '/tuner', label: '🎻 Tuner' },
   { path: '/timer', label: '⏱️ Timer' },
   { path: '/metronome', label: '🎵 Metronome' },
+  { path: '/slow-playback', label: '🐢 Slow Play' },
   { path: '/achievements', label: '🏆 Achievements' },
   { path: '/challenges', label: '🎯 Challenges' },
   { path: '/reminders', label: '⏰ Reminders' },
@@ -25,6 +26,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/tuner') return 'Violin Tuner';
   if (pathname === '/timer') return 'Practice Timer';
   if (pathname === '/metronome') return 'Metronome';
+  if (pathname === '/slow-playback') return 'Slow Playback';
   if (pathname === '/achievements') return 'Achievements';
   if (pathname === '/challenges') return 'Weekly Challenges';
   if (pathname === '/reminders') return 'Practice Reminders';
