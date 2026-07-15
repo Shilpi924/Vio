@@ -23,7 +23,7 @@ export default function OnboardingPage({ onComplete }: OnboardingPageProps) {
         <p className="text-lg text-gray-700 mb-4">Let's set up your profile.</p>
         <button 
           onClick={handleComplete}
-          className="btn-primary"
+          className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all hover:scale-105"
         >
           Get Started
         </button>
