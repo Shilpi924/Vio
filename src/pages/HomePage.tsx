@@ -1,6 +1,7 @@
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
 import { useNavigate } from 'react-router-dom';
+import KidFriendlyButton from '../components/KidFriendlyButton';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -41,9 +42,9 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome to Violin Mentor! 🎻</h1>
-          <p className="text-lg text-gray-700">Your journey to mastering the violin starts here</p>
+        <div className="mb-10 text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-3 animate-pulse">Welcome to Violin Mentor! 🎻</h1>
+          <p className="text-xl text-gray-700">Your journey to mastering the violin starts here</p>
         </div>
 
         {/* Stats Overview */}
@@ -86,70 +87,66 @@ export default function HomePage() {
         </div>
 
         {/* Quick Actions */}
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {quickActions.map((action) => (
-            <button
+            <KidFriendlyButton
               key={action.path}
               onClick={() => navigate(action.path)}
-              aria-label={`Open ${action.title}`}
-              className={`bg-gradient-to-br ${action.color} text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-left`}
+              icon={action.icon}
+              color={action.color}
+              size="large"
             >
-              <div className="text-4xl mb-3">{action.icon}</div>
-              <h3 className="text-xl font-semibold mb-1">{action.title}</h3>
-              <p className="text-sm opacity-90">{action.description}</p>
-            </button>
+              {action.title}
+            </KidFriendlyButton>
           ))}
         </div>
 
         {/* Practice Tools */}
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Practice Tools</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Practice Tools</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {practiceTools.map((tool) => (
-            <button
+            <KidFriendlyButton
               key={tool.path}
               onClick={() => navigate(tool.path)}
-              aria-label={`Open ${tool.title}`}
-              className={`bg-gradient-to-br ${tool.color} text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-left`}
+              icon={tool.icon}
+              color={tool.color}
+              size="large"
             >
-              <div className="text-4xl mb-3">{tool.icon}</div>
-              <h3 className="text-xl font-semibold mb-1">{tool.title}</h3>
-              <p className="text-sm opacity-90">{tool.description}</p>
-            </button>
+              {tool.title}
+            </KidFriendlyButton>
           ))}
         </div>
 
         {/* Parent Tools */}
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">For Parents</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">For Parents</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {parentTools.map((tool) => (
-            <button
+            <KidFriendlyButton
               key={tool.path}
               onClick={() => navigate(tool.path)}
-              aria-label={`Open ${tool.title}`}
-              className={`bg-gradient-to-br ${tool.color} text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-left`}
+              icon={tool.icon}
+              color={tool.color}
+              size="large"
             >
-              <div className="text-4xl mb-3">{tool.icon}</div>
-              <h3 className="text-xl font-semibold mb-1">{tool.title}</h3>
-              <p className="text-sm opacity-90">{tool.description}</p>
-            </button>
+              {tool.title}
+            </KidFriendlyButton>
           ))}
         </div>
 
         {/* Challenge Tools */}
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Weekly Challenges</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Weekly Challenges</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {challengeTools.map((tool) => (
-            <button
+            <KidFriendlyButton
               key={tool.path}
               onClick={() => navigate(tool.path)}
-              aria-label={`Open ${tool.title}`}
-              className={`bg-gradient-to-br ${tool.color} text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-left`}
+              icon={tool.icon}
+              color={tool.color}
+              size="large"
             >
-              <div className="text-4xl mb-3">{tool.icon}</div>
-              <h3 className="text-xl font-semibold mb-1">{tool.title}</h3>
-              <p className="text-sm opacity-90">{tool.description}</p>
-            </button>
+              {tool.title}
+            </KidFriendlyButton>
           ))}
         </div>
 
@@ -158,13 +155,15 @@ export default function HomePage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Continue Learning</h2>
           {!userProfile || userProfile.completedLessons.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 mb-4">You haven't started any lessons yet!</p>
-              <button
+              <p className="text-gray-600 mb-6 text-lg">You haven't started any lessons yet!</p>
+              <KidFriendlyButton
                 onClick={() => navigate('/curriculum')}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                icon="🎻"
+                color="from-purple-500 to-pink-600"
+                size="large"
               >
                 Start Your First Lesson
-              </button>
+              </KidFriendlyButton>
             </div>
           ) : (
             <div className="space-y-4">
@@ -173,12 +172,14 @@ export default function HomePage() {
                   <p className="font-medium text-gray-900">Lessons Completed</p>
                   <p className="text-sm text-gray-600">{userProfile.completedLessons.length} lessons</p>
                 </div>
-                <button
+                <KidFriendlyButton
                   onClick={() => navigate('/curriculum')}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  icon="📚"
+                  color="from-purple-500 to-pink-600"
+                  size="medium"
                 >
                   Continue
-                </button>
+                </KidFriendlyButton>
               </div>
             </div>
           )}
