@@ -5,6 +5,7 @@ import AIChatBot from './components/AIChatBot';
 import LessonPlayer from './components/LessonPlayer';
 import Metronome from './components/Metronome';
 import NavigationBar from './components/NavigationBar';
+import NoteMatchingGame from './components/NoteMatchingGame';
 import ParentDashboard from './components/ParentDashboard';
 import PracticeReminders from './components/PracticeReminders';
 import PracticeTimer from './components/PracticeTimer';
@@ -113,6 +114,7 @@ function App() {
         <Route path="/timer" element={<PracticeTimer />} />
         <Route path="/metronome" element={<Metronome />} />
         <Route path="/slow-playback" element={<SlowPlayback />} />
+        <Route path="/note-game" element={<NoteMatchingGame />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />} />
         <Route path="/challenges" element={<WeeklyChallenges />} />

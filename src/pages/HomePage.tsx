@@ -28,6 +28,7 @@ export default function HomePage() {
     { path: '/timer', title: 'Practice Timer', icon: '⏱️', description: 'Track your practice sessions', color: 'from-yellow-500 to-orange-600' },
     { path: '/metronome', title: 'Metronome', icon: '🎵', description: 'Keep perfect rhythm while practicing', color: 'from-teal-500 to-cyan-600' },
     { path: '/slow-playback', title: 'Slow Playback', icon: '🐢', description: 'Practice at your own pace', color: 'from-green-500 to-emerald-600' },
+    { path: '/note-game', title: 'Note Game', icon: '🎮', description: 'Play fun note matching games', color: 'from-indigo-500 to-purple-600' },
     { path: '/achievements', title: 'Achievements', icon: '🏆', description: 'Earn badges and rewards', color: 'from-purple-500 to-pink-600' },
   ];
 

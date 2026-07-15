@@ -14,6 +14,7 @@ const toolDestinations = [
   { path: '/timer', label: '⏱️ Timer' },
   { path: '/metronome', label: '🎵 Metronome' },
   { path: '/slow-playback', label: '🐢 Slow Play' },
+  { path: '/note-game', label: '🎮 Note Game' },
   { path: '/achievements', label: '🏆 Achievements' },
   { path: '/challenges', label: '🎯 Challenges' },
   { path: '/reminders', label: '⏰ Reminders' },
@@ -27,6 +28,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/timer') return 'Practice Timer';
   if (pathname === '/metronome') return 'Metronome';
   if (pathname === '/slow-playback') return 'Slow Playback';
+  if (pathname === '/note-game') return 'Note Matching Game';
   if (pathname === '/achievements') return 'Achievements';
   if (pathname === '/challenges') return 'Weekly Challenges';
   if (pathname === '/reminders') return 'Practice Reminders';
