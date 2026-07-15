@@ -5,6 +5,7 @@ import AIChatBot from './components/AIChatBot';
 import LessonPlayer from './components/LessonPlayer';
 import Metronome from './components/Metronome';
 import NavigationBar from './components/NavigationBar';
+import ParentDashboard from './components/ParentDashboard';
 import PracticeTimer from './components/PracticeTimer';
 import ViolinTuner from './components/ViolinTuner';
 import { sampleLessons } from './data/lessons';
@@ -109,6 +110,7 @@ function App() {
         <Route path="/timer" element={<PracticeTimer />} />
         <Route path="/metronome" element={<Metronome />} />
         <Route path="/achievements" element={<Achievements />} />
+        <Route path="/parent-dashboard" element={<ParentDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <AIChatBot />

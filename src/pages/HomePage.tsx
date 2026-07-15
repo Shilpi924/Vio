@@ -29,6 +29,10 @@ export default function HomePage() {
     { path: '/achievements', title: 'Achievements', icon: '🏆', description: 'Earn badges and rewards', color: 'from-purple-500 to-pink-600' },
   ];
 
+  const parentTools = [
+    { path: '/parent-dashboard', title: 'Parent Dashboard', icon: '👨‍👩‍👧', description: 'Track your child\'s progress', color: 'from-indigo-500 to-purple-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-7xl mx-auto">
@@ -98,6 +102,23 @@ export default function HomePage() {
         <h2 className="text-2xl font-semibold text-gray-900 mb-4">Practice Tools</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {practiceTools.map((tool) => (
+            <button
+              key={tool.path}
+              onClick={() => navigate(tool.path)}
+              aria-label={`Open ${tool.title}`}
+              className={`bg-gradient-to-br ${tool.color} text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-left`}
+            >
+              <div className="text-4xl mb-3">{tool.icon}</div>
+              <h3 className="text-xl font-semibold mb-1">{tool.title}</h3>
+              <p className="text-sm opacity-90">{tool.description}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Parent Tools */}
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">For Parents</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {parentTools.map((tool) => (
             <button
               key={tool.path}
               onClick={() => navigate(tool.path)}

@@ -14,6 +14,7 @@ const toolDestinations = [
   { path: '/timer', label: '⏱️ Timer' },
   { path: '/metronome', label: '🎵 Metronome' },
   { path: '/achievements', label: '🏆 Achievements' },
+  { path: '/parent-dashboard', label: '👨‍👩‍👧 Parent' },
 ];
 
 function getPageTitle(pathname: string): string {
@@ -23,6 +24,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/timer') return 'Practice Timer';
   if (pathname === '/metronome') return 'Metronome';
   if (pathname === '/achievements') return 'Achievements';
+  if (pathname === '/parent-dashboard') return 'Parent Dashboard';
 
   return primaryDestinations.find(({ path }) => pathname.startsWith(path))?.label
     ?? (pathname === '/settings' ? 'Settings' : 'Violin Mentor');
