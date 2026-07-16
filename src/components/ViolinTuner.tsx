@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const STRINGS = [
   { name: 'G', frequency: 196.00, color: 'from-red-500 to-red-600', emoji: '🔴' },
@@ -11,28 +11,55 @@ export default function ViolinTuner() {
   const [currentString, setCurrentString] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const [centsOff, setCentsOff] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isTransitioningRef = useRef(false);
 
   const handleStringSelect = (index: number) => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    
     setCurrentString(index);
     if (isListening) {
       setIsListening(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
+    setCentsOff(0);
+    
+    setTimeout(() => {
+      isTransitioningRef.current = false;
+    }, 200);
   };
 
   const startListening = () => {
+    if (isTransitioningRef.current || intervalRef.current) return;
+    
     setIsListening(true);
     // Simulate pitch detection for demo
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       const randomOffset = (Math.random() - 0.5) * 10;
       setCentsOff(Math.round(randomOffset * 10));
     }, 100);
-    
-    return () => clearInterval(interval);
   };
 
   const stopListening = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
     setIsListening(false);
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   const getTuningStatus = () => {
     if (!isListening) return 'idle';

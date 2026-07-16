@@ -44,7 +44,6 @@ export default function HomePage() {
   const quickTools = [
     { path: '/tuner', title: 'Tuner', icon: '🎻' },
     { path: '/metronome', title: 'Beat', icon: '🎵' },
-    { path: '/timer', title: 'Timer', icon: '⏱️' },
   ];
 
   return (
