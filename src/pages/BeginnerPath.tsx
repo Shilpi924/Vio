@@ -62,6 +62,8 @@ export default function BeginnerPath() {
 
   const handleStepClick = (index: number) => {
     setCurrentStep(index);
+    // Navigate to video tutorials when clicking a step
+    navigate('/video-tutorials');
   };
 
   const handleComplete = () => {

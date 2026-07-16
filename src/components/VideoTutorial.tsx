@@ -148,9 +148,14 @@ export default function VideoTutorial() {
               <div className="text-center text-white">
                 <div className="text-8xl mb-4">{selectedTutorial.thumbnail}</div>
                 <div className="text-2xl font-bold mb-2">{selectedTutorial.title}</div>
-                <div className="text-gray-300">Video player placeholder</div>
-                <button className="mt-4 px-6 py-3 bg-white text-purple-600 rounded-full font-bold hover:bg-purple-50 transition-colors">
-                  ▶️ Play Video
+                <div className="text-gray-300 mb-4">Video coming soon!</div>
+                <div className="bg-purple-600/20 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-purple-200">
+                    This video will show you step-by-step how to {selectedTutorial.title.toLowerCase()}
+                  </p>
+                </div>
+                <button className="px-6 py-3 bg-white text-purple-600 rounded-full font-bold hover:bg-purple-50 transition-colors">
+                  🎬 Coming Soon
                 </button>
               </div>
             </div>
