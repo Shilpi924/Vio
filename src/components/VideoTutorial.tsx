@@ -18,6 +18,7 @@ const tutorials: Tutorial[] = [
     duration: '3:45',
     thumbnail: '🎻',
     category: 'basics',
+    videoUrl: '/videos/hold-violin.mp4',
   },
   {
     id: '2',
@@ -26,6 +27,7 @@ const tutorials: Tutorial[] = [
     duration: '4:20',
     thumbnail: '🏹',
     category: 'basics',
+    videoUrl: '/videos/bow-hold.mp4',
   },
   {
     id: '3',
@@ -34,6 +36,7 @@ const tutorials: Tutorial[] = [
     duration: '5:00',
     thumbnail: '🎵',
     category: 'basics',
+    videoUrl: '/videos/first-sound.mp4',
   },
   {
     id: '4',
@@ -42,6 +45,7 @@ const tutorials: Tutorial[] = [
     duration: '3:30',
     thumbnail: '🔧',
     category: 'basics',
+    videoUrl: '/videos/tuning.mp4',
   },
   {
     id: '5',
@@ -50,6 +54,7 @@ const tutorials: Tutorial[] = [
     duration: '6:15',
     thumbnail: '📝',
     category: 'basics',
+    videoUrl: '/videos/reading-notes.mp4',
   },
   {
     id: '6',
@@ -58,6 +63,7 @@ const tutorials: Tutorial[] = [
     duration: '8:00',
     thumbnail: '⭐',
     category: 'songs',
+    videoUrl: '/videos/twinkle-twinkle.mp4',
   },
 ];
 
@@ -142,22 +148,35 @@ export default function VideoTutorial() {
             ← Back to tutorials
           </button>
 
-          {/* Video Placeholder */}
+          {/* Video Player */}
           <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-8 mb-4 border-4 border-purple-300">
-            <div className="aspect-video bg-black rounded-xl flex items-center justify-center relative overflow-hidden">
-              <div className="text-center text-white">
-                <div className="text-8xl mb-4">{selectedTutorial.thumbnail}</div>
-                <div className="text-2xl font-bold mb-2">{selectedTutorial.title}</div>
-                <div className="text-gray-300 mb-4">Video coming soon!</div>
-                <div className="bg-purple-600/20 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-purple-200">
-                    This video will show you step-by-step how to {selectedTutorial.title.toLowerCase()}
-                  </p>
+            <div className="aspect-video bg-black rounded-xl overflow-hidden">
+              {selectedTutorial.videoUrl ? (
+                <video
+                  controls
+                  className="w-full h-full"
+                  poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23663399'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='white' font-size='12'%3E{selectedTutorial.thumbnail}%3C/text%3E%3C/svg%3E"
+                >
+                  <source src={selectedTutorial.videoUrl} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="text-8xl mb-4">{selectedTutorial.thumbnail}</div>
+                    <div className="text-2xl font-bold mb-2">{selectedTutorial.title}</div>
+                    <div className="text-gray-300 mb-4">Video coming soon!</div>
+                    <div className="bg-purple-600/20 rounded-lg p-4 mb-4">
+                      <p className="text-sm text-purple-200">
+                        This video will show you step-by-step how to {selectedTutorial.title.toLowerCase()}
+                      </p>
+                    </div>
+                    <button className="px-6 py-3 bg-white text-purple-600 rounded-full font-bold hover:bg-purple-50 transition-colors">
+                      🎬 Coming Soon
+                    </button>
+                  </div>
                 </div>
-                <button className="px-6 py-3 bg-white text-purple-600 rounded-full font-bold hover:bg-purple-50 transition-colors">
-                  🎬 Coming Soon
-                </button>
-              </div>
+              )}
             </div>
           </div>
 
