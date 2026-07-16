@@ -109,6 +109,10 @@ export default function HomePage() {
                 <div className="text-2xl mb-1">🎻</div>
                 <div className="text-sm text-gray-700">Finger Guide</div>
               </button>
+              <button onClick={() => navigate('/audio-compare')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
+                <div className="text-2xl mb-1">🎵</div>
+                <div className="text-sm text-gray-700">Sound Compare</div>
+              </button>
               <button onClick={() => navigate('/slow-playback')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
                 <div className="text-2xl mb-1">🐢</div>
                 <div className="text-sm text-gray-700">Slow Down</div>

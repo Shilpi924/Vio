@@ -16,6 +16,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/curriculum') return 'Learn';
   if (pathname === '/beginner-path') return 'Your Journey';
   if (pathname === '/fingerboard') return 'Finger Guide';
+  if (pathname === '/audio-compare') return 'Sound Compare';
   if (pathname === '/free-play') return 'Practice';
   if (pathname === '/tutorials') return 'How-To';
   if (pathname === '/statistics') return 'Your Progress';

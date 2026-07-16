@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import Achievements from './components/Achievements';
 import AIChatBot from './components/AIChatBot';
+import AudioComparison from './components/AudioComparison';
 import InteractiveFingerboard from './components/InteractiveFingerboard';
 import LessonPlayer from './components/LessonPlayer';
 import Metronome from './components/Metronome';
@@ -95,6 +96,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/beginner-path" element={<BeginnerPath />} />
         <Route path="/fingerboard" element={<InteractiveFingerboard />} />
+        <Route path="/audio-compare" element={<AudioComparison targetNote="A4" />} />
         <Route path="/lessons" element={<LessonLibraryPage />} />
         <Route path="/lessons/:lessonId" element={<LessonRoute />} />
         <Route path="/free-play" element={<FreePlayPage />} />
