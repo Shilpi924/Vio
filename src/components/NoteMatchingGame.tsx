@@ -144,6 +144,15 @@ export default function NoteMatchingGame() {
           >
             Start Game
           </button>
+          
+          {/* What to expect explanation */}
+          <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <p className="text-sm text-blue-800">
+              <span className="font-bold">💡 What happens:</span> 
+              {" You'll see a note name and need to click the matching button. Build streaks for bonus points! The game ends when time runs out."}
+            </p>
+          </div>
+          
           {score > 0 && (
             <div className="mt-6 p-4 bg-purple-50 rounded-lg">
               <p className="text-lg font-semibold text-purple-900">Last Score: {score}</p>

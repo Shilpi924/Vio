@@ -181,6 +181,17 @@ export default function BeginnerPath() {
             </button>
           </div>
 
+          {/* What to expect explanation */}
+          <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <p className="text-sm text-blue-800">
+              <span className="font-bold">💡 What happens next:</span> 
+              {completedSteps.includes(currentStep) 
+                ? " You've completed this step! Click 'Previous' to review or continue to the next step."
+                : " Marking this step complete will unlock the next step in your violin journey. You can always come back to review."
+              }
+            </p>
+          </div>
+
           {/* Start Lesson Button */}
           {!completedSteps.includes(currentStep) && (
             <button
