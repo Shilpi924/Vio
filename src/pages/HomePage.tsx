@@ -105,13 +105,17 @@ export default function HomePage() {
           
           {showMore && (
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <button onClick={() => navigate('/fingerboard')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
+                <div className="text-2xl mb-1">🎻</div>
+                <div className="text-sm text-gray-700">Finger Guide</div>
+              </button>
               <button onClick={() => navigate('/slow-playback')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
                 <div className="text-2xl mb-1">🐢</div>
-                <div className="text-sm text-gray-700">Slow Play</div>
+                <div className="text-sm text-gray-700">Slow Down</div>
               </button>
               <button onClick={() => navigate('/note-game')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
                 <div className="text-2xl mb-1">🎮</div>
-                <div className="text-sm text-gray-700">Note Game</div>
+                <div className="text-sm text-gray-700">Fun Games</div>
               </button>
               <button onClick={() => navigate('/achievements')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
                 <div className="text-2xl mb-1">🏆</div>
@@ -131,11 +135,11 @@ export default function HomePage() {
               </button>
               <button onClick={() => navigate('/tutorials')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
                 <div className="text-2xl mb-1">📖</div>
-                <div className="text-sm text-gray-700">Tutorials</div>
+                <div className="text-sm text-gray-700">How-To</div>
               </button>
               <button onClick={() => navigate('/statistics')} className="bg-gray-100 rounded-xl p-3 hover:bg-gray-200">
                 <div className="text-2xl mb-1">📊</div>
-                <div className="text-sm text-gray-700">Progress</div>
+                <div className="text-sm text-gray-700">Your Progress</div>
               </button>
             </div>
           )}

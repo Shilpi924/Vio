@@ -15,6 +15,7 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/parent-dashboard') return 'For Parents';
   if (pathname === '/curriculum') return 'Learn';
   if (pathname === '/beginner-path') return 'Your Journey';
+  if (pathname === '/fingerboard') return 'Finger Guide';
   if (pathname === '/free-play') return 'Practice';
   if (pathname === '/tutorials') return 'How-To';
   if (pathname === '/statistics') return 'Your Progress';
