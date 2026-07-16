@@ -7,7 +7,9 @@ interface Tutorial {
   duration: string;
   thumbnail: string;
   videoUrl?: string;
+  youtubeId?: string;
   category: 'basics' | 'technique' | 'songs';
+  attribution?: string;
 }
 
 const tutorials: Tutorial[] = [
@@ -15,55 +17,61 @@ const tutorials: Tutorial[] = [
     id: '1',
     title: 'How to Hold Your Violin',
     description: 'Learn the proper way to hold your violin comfortably and safely',
-    duration: '3:45',
+    duration: '16:27',
     thumbnail: '🎻',
     category: 'basics',
-    videoUrl: '/videos/hold-violin.mp4',
+    youtubeId: 'nM6pbrgjy2c',
+    attribution: 'Nicola Benedetti',
   },
   {
     id: '2',
     title: 'Holding the Bow',
     description: 'Master the correct bow hold for beautiful sound',
-    duration: '4:20',
+    duration: '12:00',
     thumbnail: '🏹',
     category: 'basics',
-    videoUrl: '/videos/bow-hold.mp4',
+    youtubeId: 'LIZ_TPH1l2w',
+    attribution: 'Violin Lounge TV',
   },
   {
     id: '3',
     title: 'Your First Sound',
     description: 'Play your first note on the violin with confidence',
-    duration: '5:00',
+    duration: '10:00',
     thumbnail: '🎵',
     category: 'basics',
-    videoUrl: '/videos/first-sound.mp4',
+    youtubeId: 'placeholder',
+    attribution: 'Find Creative Commons video',
   },
   {
     id: '4',
     title: 'Tuning Your Violin',
     description: 'Keep your violin sounding perfect with proper tuning',
-    duration: '3:30',
+    duration: '8:00',
     thumbnail: '🔧',
     category: 'basics',
-    videoUrl: '/videos/tuning.mp4',
+    youtubeId: 'Ga5e1uyRI7g',
+    attribution: 'TakeLessons',
   },
   {
     id: '5',
     title: 'Reading Music Notes',
     description: 'Learn to read sheet music notes for violin',
-    duration: '6:15',
+    duration: '15:00',
     thumbnail: '📝',
     category: 'basics',
-    videoUrl: '/videos/reading-notes.mp4',
+    youtubeId: 'placeholder',
+    attribution: 'Find Creative Commons video',
   },
   {
     id: '6',
     title: 'Playing Twinkle Twinkle',
     description: 'Learn your first song step by step',
-    duration: '8:00',
+    duration: '12:00',
     thumbnail: '⭐',
     category: 'songs',
-    videoUrl: '/videos/twinkle-twinkle.mp4',
+    youtubeId: 'placeholder',
+    attribution: 'Find Creative Commons video',
   },
 ];
 
@@ -151,7 +159,16 @@ export default function VideoTutorial() {
           {/* Video Player */}
           <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-8 mb-4 border-4 border-purple-300">
             <div className="aspect-video bg-black rounded-xl overflow-hidden">
-              {selectedTutorial.videoUrl ? (
+              {selectedTutorial.youtubeId ? (
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${selectedTutorial.youtubeId}`}
+                  title={selectedTutorial.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : selectedTutorial.videoUrl ? (
                 <video
                   controls
                   className="w-full h-full"
@@ -184,11 +201,20 @@ export default function VideoTutorial() {
           <div className="bg-gray-50 rounded-xl p-6">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedTutorial.title}</h3>
             <p className="text-gray-600 mb-4">{selectedTutorial.description}</p>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
               <span>⏱️ {selectedTutorial.duration}</span>
               <span>•</span>
               <span className="capitalize">{selectedTutorial.category}</span>
             </div>
+
+            {/* Attribution */}
+            {selectedTutorial.attribution && (
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  <span className="font-bold">Video by:</span> {selectedTutorial.attribution}
+                </p>
+              </div>
+            )}
 
             {/* Practice Tips */}
             <div className="mt-6 bg-yellow-50 rounded-lg p-4 border-2 border-yellow-200">
