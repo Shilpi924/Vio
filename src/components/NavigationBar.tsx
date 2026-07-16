@@ -7,16 +7,17 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/tuner') return 'Tuner';
   if (pathname === '/timer') return 'Timer';
   if (pathname === '/metronome') return 'Beat Keeper';
-  if (pathname === '/slow-playback') return 'Slow Play';
-  if (pathname === '/note-game') return 'Note Game';
+  if (pathname === '/slow-playback') return 'Slow Down';
+  if (pathname === '/note-game') return 'Fun Games';
   if (pathname === '/achievements') return 'Awards';
   if (pathname === '/challenges') return 'Challenges';
   if (pathname === '/reminders') return 'Reminders';
-  if (pathname === '/parent-dashboard') return 'Parents';
+  if (pathname === '/parent-dashboard') return 'For Parents';
   if (pathname === '/curriculum') return 'Learn';
+  if (pathname === '/beginner-path') return 'Your Journey';
   if (pathname === '/free-play') return 'Practice';
-  if (pathname === '/tutorials') return 'Tutorials';
-  if (pathname === '/statistics') return 'Progress';
+  if (pathname === '/tutorials') return 'How-To';
+  if (pathname === '/statistics') return 'Your Progress';
   if (pathname === '/settings') return 'Settings';
   return 'Violin Mentor';
 }

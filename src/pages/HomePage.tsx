@@ -20,7 +20,7 @@ export default function HomePage() {
 
   // Simplified to 3 main actions - human-centered design
   const mainActions = [
-    { path: '/curriculum', title: 'Learn', icon: '📚', subtitle: 'Step-by-step lessons', color: 'from-blue-500 to-indigo-600' },
+    { path: '/beginner-path', title: 'Learn', icon: '📚', subtitle: 'Step-by-step lessons', color: 'from-blue-500 to-indigo-600' },
     { path: '/free-play', title: 'Practice', icon: '🎻', subtitle: 'Free practice mode', color: 'from-purple-500 to-pink-600' },
     { path: '/lessons', title: 'Play', icon: '🎵', subtitle: 'Learn songs', color: 'from-green-500 to-emerald-600' },
   ];
@@ -28,7 +28,7 @@ export default function HomePage() {
   // Quick tools - consolidated and simplified
   const quickTools = [
     { path: '/tuner', title: 'Tuner', icon: '🎻' },
-    { path: '/metronome', title: 'Beat', icon: '�' },
+    { path: '/metronome', title: 'Beat', icon: '🎵' },
     { path: '/timer', title: 'Timer', icon: '⏱️' },
   ];
 
@@ -147,10 +147,10 @@ export default function HomePage() {
             <div className="text-center">
               <p className="text-xl mb-4">Ready to start learning?</p>
               <button
-                onClick={() => navigate('/curriculum')}
+                onClick={() => navigate('/beginner-path')}
                 className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-purple-50 transition-colors"
               >
-                Start First Lesson →
+                Start Beginner Path →
               </button>
             </div>
           ) : (
@@ -160,7 +160,7 @@ export default function HomePage() {
                 <p className="text-purple-100">{userProfile.completedLessons.length} lessons completed</p>
               </div>
               <button
-                onClick={() => navigate('/curriculum')}
+                onClick={() => navigate('/beginner-path')}
                 className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-purple-50 transition-colors"
               >
                 Continue →

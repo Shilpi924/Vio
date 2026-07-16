@@ -15,6 +15,7 @@ import WeeklyChallenges from './components/WeeklyChallenges';
 import { sampleLessons } from './data/lessons';
 import { completeLesson } from './features/lessons/application/completeLesson';
 import { useCloudSync } from './hooks/useCloudSync';
+import BeginnerPath from './pages/BeginnerPath';
 import ChordTrainerPage from './pages/ChordTrainerPage';
 import CurriculumPage from './pages/CurriculumPage';
 import EarTrainingPage from './pages/EarTrainingPage';
@@ -91,6 +92,7 @@ function App() {
       <NavigationBar />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/beginner-path" element={<BeginnerPath />} />
         <Route path="/lessons" element={<LessonLibraryPage />} />
         <Route path="/lessons/:lessonId" element={<LessonRoute />} />
         <Route path="/free-play" element={<FreePlayPage />} />
