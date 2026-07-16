@@ -12,6 +12,7 @@ import ParentDashboard from './components/ParentDashboard';
 import PracticeReminders from './components/PracticeReminders';
 import PracticeTimer from './components/PracticeTimer';
 import SlowPlayback from './components/SlowPlayback';
+import VideoTutorial from './components/VideoTutorial';
 import ViolinTuner from './components/ViolinTuner';
 import WeeklyChallenges from './components/WeeklyChallenges';
 import { sampleLessons } from './data/lessons';
@@ -97,6 +98,7 @@ function App() {
         <Route path="/beginner-path" element={<BeginnerPath />} />
         <Route path="/fingerboard" element={<InteractiveFingerboard />} />
         <Route path="/audio-compare" element={<AudioComparison targetNote="A4" />} />
+        <Route path="/video-tutorials" element={<VideoTutorial />} />
         <Route path="/lessons" element={<LessonLibraryPage />} />
         <Route path="/lessons/:lessonId" element={<LessonRoute />} />
         <Route path="/free-play" element={<FreePlayPage />} />
