@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { pitchDetectionService } from '../services/pitchDetectionService';
 
 const STRINGS = [
   { name: 'G', frequency: 196.00, color: 'from-red-500 to-red-600', emoji: '🔴' },
@@ -33,18 +34,25 @@ export default function ViolinTuner() {
     }, 200);
   };
 
-  const startListening = () => {
+  const startListening = async () => {
     if (isTransitioningRef.current || intervalRef.current) return;
     
     setIsListening(true);
-    // Simulate pitch detection for demo
-    intervalRef.current = setInterval(() => {
-      const randomOffset = (Math.random() - 0.5) * 10;
-      setCentsOff(Math.round(randomOffset * 10));
-    }, 100);
+    
+    try {
+      await pitchDetectionService.start((noteName: string, frequency: number) => {
+        const targetFreq = STRINGS[currentString].frequency;
+        const freqDiff = frequency - targetFreq;
+        setCentsOff(Math.round(freqDiff * 100 / targetFreq * 12)); // Convert Hz to cents
+      });
+    } catch (error) {
+      console.error('Failed to start pitch detection:', error);
+      setIsListening(false);
+    }
   };
 
   const stopListening = () => {
+    pitchDetectionService.stop();
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -55,6 +63,7 @@ export default function ViolinTuner() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      pitchDetectionService.stop();
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
