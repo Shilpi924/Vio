@@ -8,19 +8,26 @@ interface Note {
 }
 
 const notes: Note[] = [
-  { name: 'G', frequency: 196.00, color: 'from-red-500 to-red-600' },
-  { name: 'A', frequency: 220.00, color: 'from-orange-500 to-orange-600' },
-  { name: 'B', frequency: 246.94, color: 'from-yellow-500 to-yellow-600' },
-  { name: 'C', frequency: 261.63, color: 'from-green-500 to-green-600' },
-  { name: 'D', frequency: 293.66, color: 'from-blue-500 to-blue-600' },
-  { name: 'E', frequency: 329.63, color: 'from-indigo-500 to-indigo-600' },
+  { name: 'G3', frequency: 196.00, color: 'from-red-500 to-red-600' },
+  { name: 'A3', frequency: 220.00, color: 'from-orange-500 to-orange-600' },
+  { name: 'B3', frequency: 246.94, color: 'from-yellow-500 to-yellow-600' },
+  { name: 'C4', frequency: 261.63, color: 'from-green-500 to-green-600' },
+  { name: 'D4', frequency: 293.66, color: 'from-blue-500 to-blue-600' },
+  { name: 'E4', frequency: 329.63, color: 'from-indigo-500 to-indigo-600' },
+  { name: 'F#4', frequency: 369.99, color: 'from-purple-500 to-purple-600' },
+  { name: 'G4', frequency: 392.00, color: 'from-pink-500 to-pink-600' },
+  { name: 'A4', frequency: 440.00, color: 'from-rose-500 to-rose-600' },
+  { name: 'B4', frequency: 493.88, color: 'from-amber-500 to-amber-600' },
+  { name: 'C5', frequency: 523.25, color: 'from-teal-500 to-teal-600' },
+  { name: 'D5', frequency: 587.33, color: 'from-cyan-500 to-cyan-600' },
 ];
 
 export default function NoteMatchingGame() {
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(45);
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFeedback, setShowFeedback] = useState<{ correct: boolean; message: string } | null>(null);
   const { playSuccessSound, playClickSound } = useSoundEffects();
@@ -38,7 +45,12 @@ export default function NoteMatchingGame() {
     setIsPlaying(true);
     setScore(0);
     setStreak(0);
-    setTimeLeft(30);
+    
+    // Set time based on difficulty
+    if (difficulty === 'easy') setTimeLeft(60);
+    else if (difficulty === 'medium') setTimeLeft(45);
+    else setTimeLeft(30);
+    
     pickRandomNote();
     playClickSound();
   };
@@ -88,8 +100,45 @@ export default function NoteMatchingGame() {
           <div className="text-6xl mb-4">🎻</div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Test Your Note Knowledge!</h3>
           <p className="text-gray-600 mb-6">Match the displayed note with the correct button. Build streaks for bonus points!</p>
+          
+          {/* Difficulty Selector */}
+          <div className="mb-6">
+            <p className="text-sm font-medium text-gray-700 mb-3">Select Difficulty:</p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setDifficulty('easy')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  difficulty === 'easy' 
+                    ? 'bg-green-500 text-white scale-105' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Easy (60s)
+              </button>
+              <button
+                onClick={() => setDifficulty('medium')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  difficulty === 'medium' 
+                    ? 'bg-yellow-500 text-white scale-105' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Medium (45s)
+              </button>
+              <button
+                onClick={() => setDifficulty('hard')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  difficulty === 'hard' 
+                    ? 'bg-red-500 text-white scale-105' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Hard (30s)
+              </button>
+            </div>
+          </div>
+          
           <button
-            onChange={startGame}
             onClick={startGame}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all hover:scale-105"
           >
@@ -142,13 +191,13 @@ export default function NoteMatchingGame() {
           )}
 
           {/* Note Buttons */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-4 gap-3 mb-6">
             {notes.map((note) => (
               <button
                 key={note.name}
                 onClick={() => handleNoteClick(note)}
                 disabled={!isPlaying}
-                className={`py-8 rounded-xl font-bold text-4xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-br ${note.color} text-white shadow-lg`}
+                className={`py-6 rounded-xl font-bold text-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-br ${note.color} text-white shadow-lg`}
               >
                 {note.name}
               </button>
@@ -170,9 +219,10 @@ export default function NoteMatchingGame() {
         <h3 className="font-semibold text-purple-900 mb-2">💡 Game Tips:</h3>
         <ul className="text-sm text-purple-800 space-y-1">
           <li>• Build streaks for bonus points (streak × 2)</li>
-          <li>• Learn the G-D-A-E violin string notes</li>
+          <li>• Learn notes across multiple octaves (G3-D5)</li>
           <li>• Practice makes perfect - play often!</li>
           <li>• Try to beat your high score</li>
+          <li>• Challenge yourself with harder difficulties</li>
         </ul>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
 import { useNavigate } from 'react-router-dom';
@@ -20,12 +20,18 @@ export default function HomePage() {
     return `${minutes}m`;
   };
 
-  // Auto-start tour for new users (no completed lessons)
-  useState(() => {
-    if (!userProfile || userProfile.completedLessons.length === 0) {
-      setTimeout(() => startTour(), 1000);
+  // Check if user has seen tour before using localStorage
+  const hasSeenTour = localStorage.getItem('hasSeenTour') === 'true';
+
+  // Auto-start tour only for first-time users
+  useEffect(() => {
+    if (!hasSeenTour) {
+      setTimeout(() => {
+        startTour();
+        localStorage.setItem('hasSeenTour', 'true');
+      }, 1000);
     }
-  });
+  }, [hasSeenTour, startTour]);
 
   // Simplified to 3 main actions - human-centered design
   const mainActions = [
