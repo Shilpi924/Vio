@@ -3,6 +3,7 @@ import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
 import { useNavigate } from 'react-router-dom';
 import KidFriendlyButton from '../components/KidFriendlyButton';
+import GuidedTour, { useGuidedTour } from '../components/GuidedTour';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function HomePage() {
   const getActiveProfile = useUserProfileStore((state) => state.getActiveProfile);
   const userProfile = getActiveProfile();
   const [showMore, setShowMore] = useState(false);
+  const { showTour, startTour, endTour } = useGuidedTour();
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -17,6 +19,13 @@ export default function HomePage() {
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
   };
+
+  // Auto-start tour for new users (no completed lessons)
+  useState(() => {
+    if (!userProfile || userProfile.completedLessons.length === 0) {
+      setTimeout(() => startTour(), 1000);
+    }
+  });
 
   // Simplified to 3 main actions - human-centered design
   const mainActions = [
@@ -42,7 +51,7 @@ export default function HomePage() {
         </div>
 
         {/* Progress summary - minimal */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div id="tour-progress" className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <div className="flex justify-around text-center">
             <div>
               <div className="text-3xl font-bold text-purple-600">{formatTime(statistics.totalPracticeTime)}</div>
@@ -66,6 +75,7 @@ export default function HomePage() {
           {mainActions.map((action) => (
             <button
               key={action.path}
+              id={`tour-${action.title.toLowerCase()}`}
               onClick={() => navigate(action.path)}
               className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all hover:scale-105 text-left"
             >
@@ -77,7 +87,7 @@ export default function HomePage() {
         </div>
 
         {/* Quick Tools - consolidated */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div id="tour-tools" className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Tools</h2>
           <div className="flex gap-4">
             {quickTools.map((tool) => (
@@ -176,6 +186,13 @@ export default function HomePage() {
             </div>
           )}
         </div>
+
+        {/* Guided Tour */}
+        <GuidedTour
+          show={showTour}
+          onComplete={endTour}
+          onSkip={endTour}
+        />
       </div>
     </div>
   );
