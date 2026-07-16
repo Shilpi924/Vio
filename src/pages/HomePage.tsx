@@ -4,11 +4,16 @@ import { useUserProfileStore } from '../store/useUserProfileStore';
 import { useNavigate } from 'react-router-dom';
 import KidFriendlyButton from '../components/KidFriendlyButton';
 import GuidedTour, { useGuidedTour } from '../components/GuidedTour';
+import GoogleSignIn from '../components/GoogleSignIn';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const statistics = useAppStore((state) => state.statistics);
   const getActiveProfile = useUserProfileStore((state) => state.getActiveProfile);
+  const signInWithGoogle = useUserProfileStore((state) => state.signInWithGoogle);
+  const signOut = useUserProfileStore((state) => state.signOut);
+  const isAuthenticated = useUserProfileStore((state) => state.isAuthenticated);
+  const googleUser = useUserProfileStore((state) => state.googleUser);
   const userProfile = getActiveProfile();
   const [showMore, setShowMore] = useState(false);
   const { showTour, startTour, endTour } = useGuidedTour();
@@ -53,6 +58,33 @@ export default function HomePage() {
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">🎻 Violin Mentor</h1>
           <p className="text-lg text-gray-600">Start your violin journey</p>
+          
+          {/* Google Sign In / User Info */}
+          <div className="mt-4">
+            {isAuthenticated && googleUser ? (
+              <div className="flex items-center justify-center gap-3 bg-white rounded-xl p-3 shadow-md">
+                {googleUser.picture && (
+                  <img 
+                    src={googleUser.picture} 
+                    alt={googleUser.name}
+                    className="w-10 h-10 rounded-full"
+                  />
+                )}
+                <div className="text-left">
+                  <p className="font-semibold text-gray-900">{googleUser.name}</p>
+                  <p className="text-sm text-gray-600">{googleUser.email}</p>
+                </div>
+                <button
+                  onClick={signOut}
+                  className="ml-4 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <GoogleSignIn onSignIn={signInWithGoogle} />
+            )}
+          </div>
         </div>
 
         {/* Progress summary - minimal */}

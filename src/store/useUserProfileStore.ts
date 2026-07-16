@@ -6,6 +6,8 @@ interface UserProfileState {
   profiles: Record<string, UserProfile>;
   activeProfileId: string;
   hasCompletedOnboarding: boolean;
+  isAuthenticated: boolean;
+  googleUser: { name: string; email: string; picture?: string } | null;
   
   // Computed property getter in components via state.profiles[state.activeProfileId]
   // but for ease we expose a getter
@@ -15,6 +17,8 @@ interface UserProfileState {
   switchProfile: (id: string) => void;
   createProfile: (name: string, data: PersonalizationData) => void;
   deleteProfile: (id: string) => void;
+  signInWithGoogle: (user: { name: string; email: string; picture?: string }) => void;
+  signOut: () => void;
   
   // Legacy actions bound to active profile
   completeOnboarding: (data: PersonalizationData) => void;
@@ -64,6 +68,8 @@ export const useUserProfileStore = create<UserProfileState>()(
       },
       activeProfileId: 'default',
       hasCompletedOnboarding: false,
+      isAuthenticated: false,
+      googleUser: null,
       
       getActiveProfile: () => {
         const { profiles, activeProfileId } = get();
@@ -98,6 +104,45 @@ export const useUserProfileStore = create<UserProfileState>()(
           delete newProfiles[id];
           const nextActive = state.activeProfileId === id ? Object.keys(newProfiles)[0] : state.activeProfileId;
           return { profiles: newProfiles, activeProfileId: nextActive };
+        });
+      },
+      
+      signInWithGoogle: (user) => {
+        set((state) => {
+          // Create or update profile with Google user data
+          const existingProfileId = Object.keys(state.profiles).find(
+            id => state.profiles[id].name === user.name
+          );
+          
+          if (existingProfileId) {
+            return {
+              ...state,
+              activeProfileId: existingProfileId,
+              isAuthenticated: true,
+              googleUser: user,
+            };
+          }
+          
+          // Create new profile for Google user
+          const newProfileId = `google_${Date.now()}`;
+          const newProfile = {
+            ...createDefaultProfile(newProfileId, user.name),
+          };
+          
+          return {
+            profiles: { ...state.profiles, [newProfileId]: newProfile },
+            activeProfileId: newProfileId,
+            isAuthenticated: true,
+            googleUser: user,
+            hasCompletedOnboarding: true,
+          };
+        });
+      },
+      
+      signOut: () => {
+        set({
+          isAuthenticated: false,
+          googleUser: null,
         });
       },
       
