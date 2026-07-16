@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCelebration } from '../components/Celebration';
+import Celebration from '../components/Celebration';
 
 const beginnerSteps = [
   {
@@ -56,6 +58,7 @@ export default function BeginnerPath() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const { celebrate, showCelebration, celebrationMessage, celebrationEmoji } = useCelebration();
 
   const handleStepClick = (index: number) => {
     setCurrentStep(index);
@@ -64,6 +67,7 @@ export default function BeginnerPath() {
   const handleComplete = () => {
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
+      celebrate("Step Complete! 🎉", "⭐");
     }
     if (currentStep < beginnerSteps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -190,6 +194,14 @@ export default function BeginnerPath() {
             </button>
           </div>
         )}
+
+        {/* Celebration Overlay */}
+        <Celebration
+          show={showCelebration}
+          message={celebrationMessage}
+          emoji={celebrationEmoji}
+          onComplete={() => {}}
+        />
       </div>
     </div>
   );
