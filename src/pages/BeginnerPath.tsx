@@ -178,6 +178,16 @@ export default function BeginnerPath() {
               {completedSteps.includes(currentStep) ? 'Completed ✓' : 'Mark Complete →'}
             </button>
           </div>
+
+          {/* Start Lesson Button */}
+          {!completedSteps.includes(currentStep) && (
+            <button
+              onClick={() => navigate('/video-tutorials')}
+              className="w-full mt-4 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105"
+            >
+              🎬 Watch Video Tutorial
+            </button>
+          )}
         </div>
 
         {/* Start Learning Button */}
