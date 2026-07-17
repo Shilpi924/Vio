@@ -6,6 +6,7 @@ import KidFriendlyButton from '../components/KidFriendlyButton';
 import GuidedTour, { useGuidedTour } from '../components/GuidedTour';
 import GoogleSignIn from '../components/GoogleSignIn';
 import DifficultyProgress from '../components/DifficultyProgress';
+import StreakFire from '../components/StreakFire';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function HomePage() {
   const googleUser = useUserProfileStore((state) => state.googleUser);
   const userProfile = getActiveProfile();
   const [showMore, setShowMore] = useState(false);
+  const [showStreakFire, setShowStreakFire] = useState(false);
   const { showTour, startTour, endTour } = useGuidedTour();
 
   const formatTime = (seconds: number) => {
@@ -38,6 +40,16 @@ export default function HomePage() {
       }, 1000);
     }
   }, [hasSeenTour, startTour]);
+
+  // Show streak fire animation on milestone streaks
+  useEffect(() => {
+    if (userProfile && userProfile.currentStreak > 0) {
+      const milestones = [3, 7, 14, 30];
+      if (milestones.includes(userProfile.currentStreak)) {
+        setShowStreakFire(true);
+      }
+    }
+  }, [userProfile]);
 
   // Simplified to 3 main actions - human-centered design
   const mainActions = [
@@ -238,6 +250,13 @@ export default function HomePage() {
           show={showTour}
           onComplete={endTour}
           onSkip={endTour}
+        />
+        
+        {/* Streak Fire Animation */}
+        <StreakFire
+          streak={userProfile?.currentStreak || 0}
+          show={showStreakFire}
+          onComplete={() => setShowStreakFire(false)}
         />
       </div>
     </div>
