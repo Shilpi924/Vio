@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 echo "Running Playwright e2e tests before push..."
 npm run test:e2e
 
