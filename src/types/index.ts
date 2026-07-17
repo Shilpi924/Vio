@@ -49,6 +49,8 @@ export interface Lesson {
   synopsis?: string;
   practiceTip?: string;
   ageBand?: 'kids' | 'teens' | 'all';
+  fullVersionNotes?: Note[]; // Optional full version of the song
+  hasFullVersion?: boolean; // Flag to indicate if full version is available
 }
 
 export type PracticeMode = 'guided' | 'performance' | 'slow-practice' | 'bowing' | 'loop';

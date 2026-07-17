@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lesson } from '../types';
 import { audioService } from '../services/audioService';
+import SongVersionToggle from './SongVersionToggle';
 
 interface LessonPlayerProps {
   lesson: Lesson;
@@ -11,6 +12,18 @@ interface LessonPlayerProps {
 export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentNoteIndex, setCurrentNoteIndex] = useState(0);
+  const [useFullVersion, setUseFullVersion] = useState(false);
+
+  const handleVersionChange = (useFull: boolean) => {
+    setUseFullVersion(useFull);
+    setCurrentNoteIndex(0); // Reset to beginning when switching versions
+  };
+
+  const getCurrentNotes = () => {
+    return useFullVersion && lesson.fullVersionNotes ? lesson.fullVersionNotes : lesson.notes;
+  };
+
+  const currentNotes = getCurrentNotes();
 
   const handlePlay = async () => {
     if (!isPlaying) {
@@ -20,9 +33,9 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
         await audioService.initialize();
         
         // Play the lesson notes
-        for (let i = currentNoteIndex; i < lesson.notes.length; i++) {
+        for (let i = currentNoteIndex; i < currentNotes.length; i++) {
           setCurrentNoteIndex(i);
-          const note = lesson.notes[i];
+          const note = currentNotes[i];
           audioService.playNote(note.note, note.duration);
           // Wait for note duration (convert beats to seconds)
           await new Promise(resolve => setTimeout(resolve, (note.duration * 60 / lesson.tempo) * 1000));
@@ -56,6 +69,13 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          {/* Song Version Toggle */}
+          <SongVersionToggle
+            hasFullVersion={lesson.hasFullVersion || false}
+            onVersionChange={handleVersionChange}
+            disabled={isPlaying}
+          />
+
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
@@ -88,9 +108,12 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
 
           {/* Notes Display */}
           <div className="bg-gray-50 rounded-xl p-4 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Notes to Play:</h3>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold text-gray-900">Notes to Play:</h3>
+              <span className="text-sm text-gray-600">{currentNotes.length} notes</span>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {lesson.notes.map((note, index) => (
+              {currentNotes.map((note, index) => (
                 <div
                   key={index}
                   className={`px-4 py-2 rounded-lg font-mono text-lg ${
