@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
 import { useNavigate } from 'react-router-dom';
-import KidFriendlyButton from '../components/KidFriendlyButton';
 import GuidedTour, { useGuidedTour } from '../components/GuidedTour';
 import GoogleSignIn from '../components/GoogleSignIn';
 import DifficultyProgress from '../components/DifficultyProgress';

@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { useUserProfileStore } from '../store/useUserProfileStore';
 
 export default function ParentDashboard() {
   const statistics = useAppStore((state) => state.statistics);
-  const getActiveProfile = useUserProfileStore((state) => state.getActiveProfile);
-  const userProfile = getActiveProfile();
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'all'>('week');
 
   const formatTime = (seconds: number) => {
@@ -38,13 +35,6 @@ export default function ParentDashboard() {
     if (accuracy >= 90) return 'text-green-600';
     if (accuracy >= 80) return 'text-yellow-600';
     return 'text-red-600';
-  };
-
-  const getPerformanceLabel = (accuracy: number) => {
-    if (accuracy >= 90) return 'Excellent';
-    if (accuracy >= 80) return 'Good';
-    if (accuracy >= 70) return 'Fair';
-    return 'Needs Improvement';
   };
 
   return (

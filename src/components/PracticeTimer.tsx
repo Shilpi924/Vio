@@ -7,7 +7,7 @@ export default function PracticeTimer() {
   const [completedGoals, setCompletedGoals] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isRunning) {
       interval = setInterval(() => {
         setSeconds((prev) => prev + 1);

@@ -12,7 +12,7 @@ export default function ViolinTuner() {
   const [currentString, setCurrentString] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const [centsOff, setCentsOff] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isTransitioningRef = useRef(false);
 
   const handleStringSelect = (index: number) => {
@@ -40,7 +40,7 @@ export default function ViolinTuner() {
     setIsListening(true);
     
     try {
-      await pitchDetectionService.start((noteName: string, frequency: number) => {
+      await pitchDetectionService.start((_noteName: string, frequency: number) => {
         const targetFreq = STRINGS[currentString].frequency;
         const freqDiff = frequency - targetFreq;
         setCentsOff(Math.round(freqDiff * 100 / targetFreq * 12)); // Convert Hz to cents

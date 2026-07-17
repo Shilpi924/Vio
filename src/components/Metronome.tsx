@@ -7,7 +7,7 @@ export default function Metronome() {
   const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isPlaying) {
       const beatDuration = (60 / bpm) * 1000;
       interval = setInterval(() => {
