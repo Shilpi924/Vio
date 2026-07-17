@@ -7,6 +7,7 @@ import GuidedTour, { useGuidedTour } from '../components/GuidedTour';
 import GoogleSignIn from '../components/GoogleSignIn';
 import DifficultyProgress from '../components/DifficultyProgress';
 import StreakFire from '../components/StreakFire';
+import PracticeSessionSummary from '../components/PracticeSessionSummary';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -218,7 +219,7 @@ export default function HomePage() {
         </div>
 
         {/* Continue Learning - simplified */}
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg p-6 text-white mb-8">
           {!userProfile || userProfile.completedLessons.length === 0 ? (
             <div className="text-center">
               <p className="text-xl mb-4">Ready to start learning?</p>
@@ -244,6 +245,9 @@ export default function HomePage() {
             </div>
           )}
         </div>
+
+        {/* Practice Session Summary */}
+        <PracticeSessionSummary />
 
         {/* Guided Tour */}
         <GuidedTour
