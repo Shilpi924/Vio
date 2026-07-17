@@ -12,6 +12,8 @@ interface UserProfileState {
   // Computed property getter in components via state.profiles[state.activeProfileId]
   // but for ease we expose a getter
   getActiveProfile: () => UserProfile | null;
+  getCurrentDifficulty: () => 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  getUnlockedFeatures: () => string[];
   
   // Actions
   switchProfile: (id: string) => void;
@@ -74,6 +76,42 @@ export const useUserProfileStore = create<UserProfileState>()(
       getActiveProfile: () => {
         const { profiles, activeProfileId } = get();
         return profiles[activeProfileId] || null;
+      },
+      
+      getCurrentDifficulty: () => {
+        const active = get().profiles[get().activeProfileId];
+        const level = active.level;
+        
+        if (level >= 20) return 'expert';
+        if (level >= 10) return 'advanced';
+        if (level >= 5) return 'intermediate';
+        return 'beginner';
+      },
+      
+      getUnlockedFeatures: () => {
+        const active = get().profiles[get().activeProfileId];
+        const level = active.level;
+        const features: string[] = [];
+        
+        // Base features available to everyone
+        features.push('basic-lessons', 'tuner', 'metronome');
+        
+        // Level 3: Unlock note matching game
+        if (level >= 3) features.push('note-matching-game');
+        
+        // Level 5: Unlock intermediate lessons and practice mode
+        if (level >= 5) features.push('intermediate-lessons', 'practice-mode');
+        
+        // Level 7: Unlock advanced lessons
+        if (level >= 7) features.push('advanced-lessons');
+        
+        // Level 10: Unlock expert lessons and performance mode
+        if (level >= 10) features.push('expert-lessons', 'performance-mode');
+        
+        // Level 15: Unlock all features
+        if (level >= 15) features.push('all-features');
+        
+        return features;
       },
       
       switchProfile: (id) => {

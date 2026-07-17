@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import KidFriendlyButton from '../components/KidFriendlyButton';
 import GuidedTour, { useGuidedTour } from '../components/GuidedTour';
 import GoogleSignIn from '../components/GoogleSignIn';
+import DifficultyProgress from '../components/DifficultyProgress';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -88,23 +89,27 @@ export default function HomePage() {
         </div>
 
         {/* Progress summary - minimal */}
-        <div id="tour-progress" className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex justify-around text-center">
-            <div>
-              <div className="text-3xl font-bold text-purple-600">{formatTime(statistics.totalPracticeTime)}</div>
-              <div className="text-sm text-gray-500">Practice</div>
-            </div>
-            <div className="w-px bg-gray-200"></div>
-            <div>
-              <div className="text-3xl font-bold text-green-600">{statistics.streak}</div>
-              <div className="text-sm text-gray-500">Day Streak</div>
-            </div>
-            <div className="w-px bg-gray-200"></div>
-            <div>
-              <div className="text-3xl font-bold text-blue-600">{statistics.accuracy.toFixed(0)}%</div>
-              <div className="text-sm text-gray-500">Accuracy</div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div id="tour-progress" className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="flex justify-around text-center">
+              <div>
+                <div className="text-3xl font-bold text-purple-600">{formatTime(statistics.totalPracticeTime)}</div>
+                <div className="text-sm text-gray-500">Practice</div>
+              </div>
+              <div className="w-px bg-gray-200"></div>
+              <div>
+                <div className="text-3xl font-bold text-green-600">{statistics.streak}</div>
+                <div className="text-sm text-gray-500">Day Streak</div>
+              </div>
+              <div className="w-px bg-gray-200"></div>
+              <div>
+                <div className="text-3xl font-bold text-blue-600">{statistics.accuracy.toFixed(0)}%</div>
+                <div className="text-sm text-gray-500">Accuracy</div>
+              </div>
             </div>
           </div>
+          
+          <DifficultyProgress showUnlockedFeatures={false} />
         </div>
 
         {/* 3 Main Actions - clear and obvious */}
