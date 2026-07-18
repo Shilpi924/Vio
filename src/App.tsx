@@ -57,7 +57,7 @@ function LessonRoute() {
       <div className="max-w-7xl mx-auto">
         <LessonPlayer
           lesson={lesson}
-          onExit={() => navigate('/lessons')}
+          onExit={() => navigate(-1)}
           onComplete={() => {
             completeLesson(lesson.id);
             navigate('/lessons', { replace: true });
