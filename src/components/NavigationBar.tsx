@@ -1,28 +1,12 @@
-import { ArrowLeft, Home, Settings } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 function getPageTitle(pathname: string): string {
-  if (pathname === '/') return 'Home';
-  if (pathname.startsWith('/lessons')) return 'Songs';
-  if (pathname === '/tuner') return 'Tuner';
-  if (pathname === '/timer') return 'Timer';
-  if (pathname === '/metronome') return 'Beat Keeper';
-  if (pathname === '/slow-playback') return 'Slow Down';
-  if (pathname === '/note-game') return 'Fun Games';
-  if (pathname === '/achievements') return 'Awards';
-  if (pathname === '/challenges') return 'Challenges';
-  if (pathname === '/reminders') return 'Reminders';
-  if (pathname === '/parent-dashboard') return 'For Parents';
-  if (pathname === '/curriculum') return 'Learn';
-  if (pathname === '/beginner-path') return 'Your Journey';
-  if (pathname === '/fingerboard') return 'Finger Guide';
-  if (pathname === '/audio-compare') return 'Sound Compare';
-  if (pathname === '/video-tutorials') return 'Video Lessons';
-  if (pathname === '/free-play') return 'Practice';
-  if (pathname === '/tutorials') return 'How-To';
-  if (pathname === '/statistics') return 'Your Progress';
-  if (pathname === '/settings') return 'Settings';
-  return 'Violin Mentor';
+  if (pathname === '/') return '� Violin Kids';
+  if (pathname === '/beginner-path') return '� Learn Violin';
+  if (pathname === '/free-play') return '🎵 Free Play';
+  if (pathname.startsWith('/lessons')) return '🎶 Songs';
+  return '� Violin Kids';
 }
 
 export default function NavigationBar() {
@@ -31,41 +15,32 @@ export default function NavigationBar() {
   const showBackButton = location.pathname !== '/';
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
-      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
+    <nav className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50 border-b border-gray-100">
+      <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-4">
         {/* Back Button */}
         {showBackButton && (
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-2xl"
             title="Go back"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            ←
           </button>
         )}
 
         {/* Home Button */}
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-xl transition-colors"
           title="Home"
         >
-          <Home className="w-5 h-5 text-purple-600" />
+          <Home className="w-6 h-6 text-purple-600" />
         </button>
 
         {/* Page Title */}
-        <div className="flex-1">
-          <h1 className="text-lg font-semibold text-gray-900">{getPageTitle(location.pathname)}</h1>
+        <div className="flex-1 text-center">
+          <h1 className="text-xl font-bold text-gray-800">{getPageTitle(location.pathname)}</h1>
         </div>
-
-        {/* Settings Button */}
-        <button
-          onClick={() => navigate('/settings')}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          title="Settings"
-        >
-          <Settings className="w-5 h-5 text-gray-600" />
-        </button>
       </div>
     </nav>
   );

@@ -1,0 +1,145 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: free-play.spec.ts >> Free Play Page Tests >> page is responsive on mobile
+- Location: tests/free-play.spec.ts:111:3
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByText('Free Play')
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for getByText('Free Play')
+
+```
+
+# Test source
+
+```ts
+  15  |     await expect(practiceModeButton).toBeVisible();
+  16  |     
+  17  |     await practiceModeButton.click();
+  18  |     await expect(page.getByText('🎵 Free Mode')).toBeVisible();
+  19  |     
+  20  |     await page.getByText('🎵 Free Mode').click();
+  21  |     await expect(page.getByText('🎯 Practice Mode')).toBeVisible();
+  22  |   });
+  23  | 
+  24  |   test('volume control is visible and adjustable', async ({ page }) => {
+  25  |     const volumeSlider = page.locator('input[type="range"]');
+  26  |     const isVisible = await volumeSlider.isVisible();
+  27  |     if (isVisible) {
+  28  |       await volumeSlider.fill('0.8');
+  29  |       await expect(volumeSlider).toHaveValue('0.8');
+  30  |     }
+  31  |   });
+  32  | 
+  33  |   test('pitch detection toggle is visible', async ({ page }) => {
+  34  |     const startListeningButton = page.getByText('🎙️ Start Listening').or(page.getByText('Start Listening')).or(page.getByText('Listening'));
+  35  |     const isVisible = await startListeningButton.isVisible();
+  36  |     if (isVisible) {
+  37  |       await startListeningButton.click();
+  38  |       const stopButton = page.getByText('🎙️ Stop Listening').or(page.getByText('Stop Listening'));
+  39  |       await expect(stopButton.first()).toBeVisible();
+  40  |     }
+  41  |   });
+  42  | 
+  43  |   test('instructions section is displayed', async ({ page }) => {
+  44  |     const instructions = page.getByText('How to Use Free Play').or(page.getByText('Instructions').or(page.getByText('How to Use')));
+  45  |     const isVisible = await instructions.isVisible();
+  46  |     if (isVisible) {
+  47  |       await expect(instructions).toBeVisible();
+  48  |     }
+  49  |   });
+  50  | 
+  51  |   test('quick reference section displays all strings', async ({ page }) => {
+  52  |     const quickRef = page.getByText('Quick Reference').or(page.getByText('Reference'));
+  53  |     const isVisible = await quickRef.isVisible();
+  54  |     if (isVisible) {
+  55  |       await expect(quickRef).toBeVisible();
+  56  |     }
+  57  |   });
+  58  | 
+  59  |   test('practice mode shows target note when activated', async ({ page }) => {
+  60  |     const practiceButton = page.getByText('🎯 Practice Mode').or(page.getByText('Practice Mode'));
+  61  |     const isVisible = await practiceButton.isVisible();
+  62  |     if (isVisible) {
+  63  |       await practiceButton.click();
+  64  |       // Should show target note display
+  65  |       const targetNote = page.getByText('Target Note');
+  66  |       if (await targetNote.isVisible()) {
+  67  |         await expect(targetNote).toBeVisible();
+  68  |       }
+  69  |     }
+  70  |   });
+  71  | 
+  72  |   test('detected pitch display is hidden when not listening', async ({ page }) => {
+  73  |     const detectedPitch = page.getByText('Detected Pitch');
+  74  |     const isVisible = await detectedPitch.isVisible();
+  75  |     expect(isVisible).toBeFalsy();
+  76  |   });
+  77  | 
+  78  |   test('detected pitch display is shown when listening', async ({ page }) => {
+  79  |     const startButton = page.getByText('🎙️ Start Listening').or(page.getByText('Start Listening'));
+  80  |     const isVisible = await startButton.isVisible();
+  81  |     if (isVisible) {
+  82  |       await startButton.click();
+  83  |       // The display should appear (even if no pitch is detected yet)
+  84  |       const detectedPitch = page.getByText('Detected Pitch');
+  85  |       await expect(detectedPitch.first()).toBeVisible();
+  86  |     }
+  87  |   });
+  88  | 
+  89  |   test('accuracy display is shown in practice mode', async ({ page }) => {
+  90  |     const practiceButton = page.getByText('🎯 Practice Mode').or(page.getByText('Practice Mode'));
+  91  |     const isVisible = await practiceButton.isVisible();
+  92  |     if (isVisible) {
+  93  |       await practiceButton.click();
+  94  |       const accuracy = page.getByText('Accuracy');
+  95  |       if (await accuracy.isVisible()) {
+  96  |         await expect(accuracy).toBeVisible();
+  97  |       }
+  98  |     }
+  99  |   });
+  100 | 
+  101 |   test('virtual fingerboard is displayed', async ({ page }) => {
+  102 |     // The fingerboard should be visible on the page
+  103 |     await expect(page.locator('.fingerboard, [data-testid="fingerboard"], canvas, svg').first()).toBeVisible();
+  104 |   });
+  105 | 
+  106 |   test('violin strings are displayed', async ({ page }) => {
+  107 |     // Strings should be visible
+  108 |     await expect(page.locator('.strings, [data-testid="strings"], canvas, svg').first()).toBeVisible();
+  109 |   });
+  110 | 
+  111 |   test('page is responsive on mobile', async ({ page }) => {
+  112 |     await page.setViewportSize({ width: 375, height: 667 });
+  113 |     await page.goto('/free-play');
+  114 |     
+> 115 |     await expect(page.getByText('Free Play')).toBeVisible();
+      |                                               ^ Error: expect(locator).toBeVisible() failed
+  116 |     await expect(page.getByText('🎯 Practice Mode')).toBeVisible();
+  117 |   });
+  118 | 
+  119 |   test('page is responsive on tablet', async ({ page }) => {
+  120 |     await page.setViewportSize({ width: 768, height: 1024 });
+  121 |     await page.goto('/free-play');
+  122 |     
+  123 |     await expect(page.getByText('Free Play')).toBeVisible();
+  124 |     await expect(page.getByText('🎯 Practice Mode')).toBeVisible();
+  125 |   });
+  126 | });
+  127 | 
+```

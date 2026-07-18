@@ -1,0 +1,166 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: components.spec.ts >> Violin Tuner Component Tests >> tuner displays string names
+- Location: tests/components.spec.ts:15:3
+
+# Error details
+
+```
+Error: locator.isVisible: Error: strict mode violation: getByText('G') resolved to 4 elements:
+    1) <span part="plugin" class="plugin">[plugin:vite:oxc] </span> aka getByText('[plugin:vite:oxc]')
+    2) <span part="message-body" class="message-body">Transform failed with 1 error:↵↵[PARSE_ERROR] Ide…</span> aka getByText('Transform failed with 1 error')
+    3) <pre part="stack" class="stack">…</pre> aka getByText('at transformWithOxc (file:///')
+    4) <code part="config-file-name">vite.config.js</code> aka getByText('vite.config.js')
+
+Call log:
+    - checking visibility of getByText('G')
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]: "[plugin:vite:oxc] Transform failed with 1 error: [PARSE_ERROR] Identifier `AccountPage` has already been declared ╭─[ src/App.jsx:1:8 ] │ 1 │ import AccountPage from \"./pages/AccountPage\"; │ ─────┬───── │ ╰─────── `AccountPage` has already been declared here │ 10 │ import AccountPage from \"./pages/AccountPage\"; │ ─────┬───── │ ╰─────── It can not be redeclared here ────╯"
+  - generic [ref=e5]: /Users/shilpisharma/Projects/BookCompass-app-new/src/App.jsx
+  - generic [ref=e6]: at transformWithOxc (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:3338:19) at TransformPluginContext.transform (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:3409:26) at EnvironmentPluginContainer.transform (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:30273:51) at async loadAndTransform (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:24532:26) at async viteTransformMiddleware (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:24326:20)
+  - generic [ref=e7]:
+    - text: Click outside, press Esc key, or fix the code to dismiss.
+    - text: You can also disable this overlay by setting
+    - code [ref=e8]: server.hmr.overlay
+    - text: to
+    - code [ref=e9]: "false"
+    - text: in
+    - code [ref=e10]: vite.config.js
+    - text: .
+```
+
+# Test source
+
+```ts
+  1   | import { test, expect } from '@playwright/test';
+  2   | 
+  3   | test.describe('Violin Tuner Component Tests', () => {
+  4   |   test.beforeEach(async ({ page }) => {
+  5   |     await page.goto('/tuner');
+  6   |   });
+  7   | 
+  8   |   test('tuner page loads', async ({ page }) => {
+  9   |     const tunerHeading = page.getByText('Tuner', { exact: true });
+  10  |     const violinTunerHeading = page.getByText('Violin Tuner');
+  11  |     const isVisible = await tunerHeading.isVisible() || await violinTunerHeading.isVisible();
+  12  |     expect(isVisible).toBeTruthy();
+  13  |   });
+  14  | 
+  15  |   test('tuner displays string names', async ({ page }) => {
+  16  |     const gString = page.getByText('G');
+  17  |     const g3String = page.getByText('G3');
+> 18  |     expect(await gString.isVisible() || await g3String.isVisible()).toBeTruthy();
+      |                          ^ Error: locator.isVisible: Error: strict mode violation: getByText('G') resolved to 4 elements:
+  19  |     
+  20  |     const dString = page.getByText('D');
+  21  |     const d4String = page.getByText('D4');
+  22  |     expect(await dString.isVisible() || await d4String.isVisible()).toBeTruthy();
+  23  |     
+  24  |     const aString = page.getByText('A');
+  25  |     const a4String = page.getByText('A4');
+  26  |     expect(await aString.isVisible() || await a4String.isVisible()).toBeTruthy();
+  27  |     
+  28  |     const eString = page.getByText('E');
+  29  |     const e5String = page.getByText('E5');
+  30  |     expect(await eString.isVisible() || await e5String.isVisible()).toBeTruthy();
+  31  |   });
+  32  | });
+  33  | 
+  34  | test.describe('Metronome Component Tests', () => {
+  35  |   test.beforeEach(async ({ page }) => {
+  36  |     await page.goto('/metronome');
+  37  |   });
+  38  | 
+  39  |   test('metronome page loads', async ({ page }) => {
+  40  |     const metronomeHeading = page.getByText('Metronome', { exact: true });
+  41  |     const beatHeading = page.getByText('Beat');
+  42  |     const isVisible = await metronomeHeading.isVisible() || await beatHeading.isVisible();
+  43  |     expect(isVisible).toBeTruthy();
+  44  |   });
+  45  | 
+  46  |   test('metronome has tempo control', async ({ page }) => {
+  47  |     const tempoSlider = page.locator('input[type="range"]').first();
+  48  |     await expect(tempoSlider).toBeVisible();
+  49  |   });
+  50  | 
+  51  |   test('metronome has start/stop button', async ({ page }) => {
+  52  |     const startButton = page.getByText('Start');
+  53  |     const playButton = page.getByText('Play');
+  54  |     const anyButton = page.getByRole('button').first();
+  55  |     const isVisible = await startButton.isVisible() || await playButton.isVisible() || await anyButton.isVisible();
+  56  |     expect(isVisible).toBeTruthy();
+  57  |   });
+  58  | });
+  59  | 
+  60  | test.describe('Practice Timer Component Tests', () => {
+  61  |   test.beforeEach(async ({ page }) => {
+  62  |     await page.goto('/timer');
+  63  |   });
+  64  | 
+  65  |   test('timer page loads', async ({ page }) => {
+  66  |     const timerHeading = page.getByText('Timer');
+  67  |     const practiceTimerHeading = page.getByText('Practice Timer');
+  68  |     const isVisible = await timerHeading.isVisible() || await practiceTimerHeading.isVisible();
+  69  |     expect(isVisible).toBeTruthy();
+  70  |   });
+  71  | 
+  72  |   test('timer displays time', async ({ page }) => {
+  73  |     const timePattern = page.locator('text=/\\d+:\\d{2}/');
+  74  |     const defaultTime = page.getByText('00:00');
+  75  |     const isVisible = await timePattern.isVisible() || await defaultTime.isVisible();
+  76  |     expect(isVisible).toBeTruthy();
+  77  |   });
+  78  | });
+  79  | 
+  80  | test.describe('Interactive Fingerboard Component Tests', () => {
+  81  |   test.beforeEach(async ({ page }) => {
+  82  |     await page.goto('/fingerboard');
+  83  |   });
+  84  | 
+  85  |   test('fingerboard page loads', async ({ page }) => {
+  86  |     const fingerboardHeading = page.getByText('Fingerboard');
+  87  |     const fingerGuideHeading = page.getByText('Finger Guide');
+  88  |     const isVisible = await fingerboardHeading.isVisible() || await fingerGuideHeading.isVisible();
+  89  |     expect(isVisible).toBeTruthy();
+  90  |   });
+  91  | 
+  92  |   test('fingerboard is interactive', async ({ page }) => {
+  93  |     // The fingerboard should be visible
+  94  |     const fingerboard = page.locator('canvas, svg, .fingerboard').first();
+  95  |     await expect(fingerboard).toBeVisible();
+  96  |   });
+  97  | });
+  98  | 
+  99  | test.describe('Video Tutorial Component Tests', () => {
+  100 |   test.beforeEach(async ({ page }) => {
+  101 |     await page.goto('/video-tutorials');
+  102 |   });
+  103 | 
+  104 |   test('video tutorials page loads', async ({ page }) => {
+  105 |     const videoHeading = page.getByText('Video');
+  106 |     const tutorialHeading = page.getByText('Tutorial');
+  107 |     const videoLessonsHeading = page.getByText('Video Lessons');
+  108 |     const isVisible = await videoHeading.isVisible() || await tutorialHeading.isVisible() || await videoLessonsHeading.isVisible();
+  109 |     expect(isVisible).toBeTruthy();
+  110 |   });
+  111 | });
+  112 | 
+  113 | test.describe('Achievements Component Tests', () => {
+  114 |   test.beforeEach(async ({ page }) => {
+  115 |     await page.goto('/achievements');
+  116 |   });
+  117 | 
+  118 |   test('achievements page loads', async ({ page }) => {
+```

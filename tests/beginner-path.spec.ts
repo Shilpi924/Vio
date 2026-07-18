@@ -6,37 +6,29 @@ test.describe('Beginner Path Page Tests', () => {
   });
 
   test('beginner path page loads with correct heading', async ({ page }) => {
-    const beginnerHeading = page.getByText('Beginner');
-    const learningPathHeading = page.getByText('Learning Path');
-    const isVisible = await beginnerHeading.isVisible() || await learningPathHeading.isVisible();
+    const violinHeading = page.getByText('� Your Violin Journey');
+    const isVisible = await violinHeading.isVisible();
     expect(isVisible).toBeTruthy();
   });
 
-  test('lesson cards are displayed', async ({ page }) => {
-    // Lessons should be displayed as cards or list items
-    const lessonCards = page.locator('.lesson, [data-testid="lesson"], .card').first();
-    const article = page.getByRole('article').first();
-    const isVisible = await lessonCards.isVisible() || await article.isVisible();
-    expect(isVisible).toBeTruthy();
+  test('progress bar is visible', async ({ page }) => {
+    await expect(page.getByText('Progress')).toBeVisible();
   });
 
-  test('lesson progress is visible', async ({ page }) => {
-    // Progress indicators should be visible
-    await expect(page.locator('[style*="width"], .progress, [data-testid="progress"]').first()).toBeVisible();
+  test('current step card is displayed', async ({ page }) => {
+    await expect(page.getByText('I did it!')).toBeVisible();
   });
 
-  test('lessons are clickable', async ({ page }) => {
-    const firstLesson = page.locator('.lesson, [data-testid="lesson"], .card, button').first();
-    await expect(firstLesson).toBeVisible();
+  test('steps overview is displayed', async ({ page }) => {
+    await expect(page.getByText('All Steps')).toBeVisible();
   });
 
   test('page is responsive on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/beginner-path');
     
-    const beginnerHeading = page.getByText('Beginner');
-    const learningPathHeading = page.getByText('Learning Path');
-    const isVisible = await beginnerHeading.isVisible() || await learningPathHeading.isVisible();
+    const violinHeading = page.getByText('� Your Violin Journey');
+    const isVisible = await violinHeading.isVisible();
     expect(isVisible).toBeTruthy();
   });
 
@@ -44,9 +36,8 @@ test.describe('Beginner Path Page Tests', () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/beginner-path');
     
-    const beginnerHeading = page.getByText('Beginner');
-    const learningPathHeading = page.getByText('Learning Path');
-    const isVisible = await beginnerHeading.isVisible() || await learningPathHeading.isVisible();
+    const violinHeading = page.getByText('� Your Violin Journey');
+    const isVisible = await violinHeading.isVisible();
     expect(isVisible).toBeTruthy();
   });
 });

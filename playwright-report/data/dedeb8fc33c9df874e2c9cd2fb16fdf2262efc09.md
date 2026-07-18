@@ -1,0 +1,174 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: free-play.spec.ts >> Free Play Page Tests >> practice mode shows target note when activated
+- Location: tests/free-play.spec.ts:56:3
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: locator.click: Test timeout of 30000ms exceeded.
+Call log:
+  - waiting for getByText('🎯 Practice Mode')
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]: "[plugin:vite:oxc] Transform failed with 1 error: [PARSE_ERROR] Identifier `AccountPage` has already been declared ╭─[ src/App.jsx:1:8 ] │ 1 │ import AccountPage from \"./pages/AccountPage\"; │ ─────┬───── │ ╰─────── `AccountPage` has already been declared here │ 10 │ import AccountPage from \"./pages/AccountPage\"; │ ─────┬───── │ ╰─────── It can not be redeclared here ────╯"
+  - generic [ref=e5]: /Users/shilpisharma/Projects/BookCompass-app-new/src/App.jsx
+  - generic [ref=e6]: at transformWithOxc (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:3338:19) at TransformPluginContext.transform (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:3409:26) at EnvironmentPluginContainer.transform (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:30273:51) at async loadAndTransform (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:24532:26) at async viteTransformMiddleware (file:///Users/shilpisharma/Projects/BookCompass-app-new/node_modules/vite/dist/node/chunks/node.js:24326:20)
+  - generic [ref=e7]:
+    - text: Click outside, press Esc key, or fix the code to dismiss.
+    - text: You can also disable this overlay by setting
+    - code [ref=e8]: server.hmr.overlay
+    - text: to
+    - code [ref=e9]: "false"
+    - text: in
+    - code [ref=e10]: vite.config.js
+    - text: .
+```
+
+# Test source
+
+```ts
+  1   | import { test, expect } from '@playwright/test';
+  2   | 
+  3   | test.describe('Free Play Page Tests', () => {
+  4   |   test.beforeEach(async ({ page }) => {
+  5   |     await page.goto('/free-play');
+  6   |   });
+  7   | 
+  8   |   test('free play page loads with correct heading', async ({ page }) => {
+  9   |     await expect(page.getByText('Free Play')).toBeVisible();
+  10  |     await expect(page.getByText('Practice freely with your violin or use the virtual fingerboard')).toBeVisible();
+  11  |   });
+  12  | 
+  13  |   test('practice mode toggle is visible and functional', async ({ page }) => {
+  14  |     const practiceModeButton = page.getByText('🎯 Practice Mode');
+  15  |     await expect(practiceModeButton).toBeVisible();
+  16  |     
+  17  |     await practiceModeButton.click();
+  18  |     await expect(page.getByText('🎵 Free Mode')).toBeVisible();
+  19  |     
+  20  |     await page.getByText('🎵 Free Mode').click();
+  21  |     await expect(page.getByText('🎯 Practice Mode')).toBeVisible();
+  22  |   });
+  23  | 
+  24  |   test('volume control is visible and adjustable', async ({ page }) => {
+  25  |     const volumeSlider = page.locator('input[type="range"]');
+  26  |     const isVisible = await volumeSlider.isVisible();
+  27  |     if (isVisible) {
+  28  |       await volumeSlider.fill('0.8');
+  29  |       await expect(volumeSlider).toHaveValue('0.8');
+  30  |     }
+  31  |   });
+  32  | 
+  33  |   test('pitch detection toggle is visible', async ({ page }) => {
+  34  |     const startListeningButton = page.getByText('🎙️ Start Listening').or(page.getByText('Start Listening')).or(page.getByText('Listening'));
+  35  |     const isVisible = await startListeningButton.isVisible();
+  36  |     if (isVisible) {
+  37  |       await startListeningButton.click();
+  38  |       const stopButton = page.getByText('🎙️ Stop Listening').or(page.getByText('Stop Listening'));
+  39  |       await expect(stopButton.first()).toBeVisible();
+  40  |     }
+  41  |   });
+  42  | 
+  43  |   test('instructions section is displayed', async ({ page }) => {
+  44  |     const instructions = page.getByText('How to Use Free Play').or(page.getByText('Instructions').or(page.getByText('How to Use')));
+  45  |     const isVisible = await instructions.isVisible();
+  46  |     if (isVisible) {
+  47  |       await expect(instructions).toBeVisible();
+  48  |     }
+  49  |   });
+  50  | 
+  51  |   test('quick reference section displays all strings', async ({ page }) => {
+  52  |     const quickRef = page.getByText('Quick Reference').or(page.getByText('Reference'));
+  53  |     const isVisible = await quickRef.isVisible();
+  54  |     if (isVisible) {
+  55  |       await expect(quickRef).toBeVisible();
+  56  |     }
+> 57  |   });
+      |                                              ^ Error: locator.click: Test timeout of 30000ms exceeded.
+  58  | 
+  59  |   test('practice mode shows target note when activated', async ({ page }) => {
+  60  |     const practiceButton = page.getByText('🎯 Practice Mode').or(page.getByText('Practice Mode'));
+  61  |     const isVisible = await practiceButton.isVisible();
+  62  |     if (isVisible) {
+  63  |       await practiceButton.click();
+  64  |       // Should show target note display
+  65  |       const targetNote = page.getByText('Target Note');
+  66  |       if (await targetNote.isVisible()) {
+  67  |         await expect(targetNote).toBeVisible();
+  68  |       }
+  69  |     }
+  70  |   });
+  71  | 
+  72  |   test('detected pitch display is hidden when not listening', async ({ page }) => {
+  73  |     const detectedPitch = page.getByText('Detected Pitch');
+  74  |     const isVisible = await detectedPitch.isVisible();
+  75  |     expect(isVisible).toBeFalsy();
+  76  |   });
+  77  | 
+  78  |   test('detected pitch display is shown when listening', async ({ page }) => {
+  79  |     const startButton = page.getByText('🎙️ Start Listening').or(page.getByText('Start Listening'));
+  80  |     const isVisible = await startButton.isVisible();
+  81  |     if (isVisible) {
+  82  |       await startButton.click();
+  83  |       // The display should appear (even if no pitch is detected yet)
+  84  |       const detectedPitch = page.getByText('Detected Pitch');
+  85  |       await expect(detectedPitch.first()).toBeVisible();
+  86  |     }
+  87  |   });
+  88  | 
+  89  |   test('accuracy display is shown in practice mode', async ({ page }) => {
+  90  |     const practiceButton = page.getByText('🎯 Practice Mode').or(page.getByText('Practice Mode'));
+  91  |     const isVisible = await practiceButton.isVisible();
+  92  |     if (isVisible) {
+  93  |       await practiceButton.click();
+  94  |       const accuracy = page.getByText('Accuracy');
+  95  |       if (await accuracy.isVisible()) {
+  96  |         await expect(accuracy).toBeVisible();
+  97  |       }
+  98  |     }
+  99  |   });
+  100 | 
+  101 |   test('virtual fingerboard is displayed', async ({ page }) => {
+  102 |     // The fingerboard should be visible on the page
+  103 |     await expect(page.locator('.fingerboard, [data-testid="fingerboard"], canvas, svg').first()).toBeVisible();
+  104 |   });
+  105 | 
+  106 |   test('violin strings are displayed', async ({ page }) => {
+  107 |     // Strings should be visible
+  108 |     await expect(page.locator('.strings, [data-testid="strings"], canvas, svg').first()).toBeVisible();
+  109 |   });
+  110 | 
+  111 |   test('page is responsive on mobile', async ({ page }) => {
+  112 |     await page.setViewportSize({ width: 375, height: 667 });
+  113 |     await page.goto('/free-play');
+  114 |     
+  115 |     await expect(page.getByText('Free Play')).toBeVisible();
+  116 |     await expect(page.getByText('🎯 Practice Mode')).toBeVisible();
+  117 |   });
+  118 | 
+  119 |   test('page is responsive on tablet', async ({ page }) => {
+  120 |     await page.setViewportSize({ width: 768, height: 1024 });
+  121 |     await page.goto('/free-play');
+  122 |     
+  123 |     await expect(page.getByText('Free Play')).toBeVisible();
+  124 |     await expect(page.getByText('🎯 Practice Mode')).toBeVisible();
+  125 |   });
+  126 | });
+  127 | 
+```

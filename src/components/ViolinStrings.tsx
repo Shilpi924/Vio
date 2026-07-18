@@ -42,28 +42,13 @@ export default function ViolinStrings({
                   key={string.name}
                   onClick={() => onStringClick?.(string.name)}
                   className={`
-                    relative cursor-pointer transition-all duration-200
+                    flex items-center gap-4 relative cursor-pointer transition-all duration-200
                     ${isActive ? 'transform scale-105' : 'hover:scale-102'}
                   `}
                 >
-                  {/* String */}
-                  <div
-                    className={`
-                      ${stringThickness} rounded-full shadow-md
-                      ${isActive 
-                        ? 'bg-green-500 shadow-green-500/50' 
-                        : 'hover:bg-amber-600'
-                      }
-                    `}
-                    style={{ 
-                      backgroundColor: isActive ? undefined : VIOLIN_STRING_COLORS[string.name],
-                      boxShadow: isActive ? '0 0 20px rgba(34, 197, 94, 0.6)' : undefined
-                    }}
-                  ></div>
-                  
                   {/* String label */}
                   {showLabels && (
-                    <div className="absolute -left-24 top-1/2 transform -translate-y-1/2">
+                    <div className="w-16 text-right shrink-0 z-10">
                       <span className={`text-sm font-medium ${
                         isActive ? 'text-green-600' : 'text-amber-900'
                       }`}>
@@ -71,22 +56,40 @@ export default function ViolinStrings({
                       </span>
                     </div>
                   )}
+
+                  {/* String Container */}
+                  <div className="flex-1 relative">
+                    {/* String line */}
+                    <div
+                      className={`
+                        ${stringThickness} rounded-full shadow-md
+                        ${isActive 
+                          ? 'bg-green-500 shadow-green-500/50' 
+                          : 'hover:bg-amber-600'
+                        }
+                      `}
+                      style={{ 
+                        backgroundColor: isActive ? undefined : VIOLIN_STRING_COLORS[string.name],
+                        boxShadow: isActive ? '0 0 20px rgba(34, 197, 94, 0.6)' : undefined
+                      }}
+                    ></div>
+                    
+                    {/* Vibration effect when active */}
+                    {isActive && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none -translate-y-1/2 top-1/2">
+                        <div className="w-full h-8 bg-green-400/20 rounded-full animate-pulse"></div>
+                      </div>
+                    )}
+                  </div>
                   
                   {/* Frequency */}
                   {showLabels && (
-                    <div className="absolute -right-24 top-1/2 transform -translate-y-1/2">
+                    <div className="w-20 text-left shrink-0 z-10">
                       <span className={`text-xs ${
                         isActive ? 'text-green-600' : 'text-amber-700'
                       }`}>
                         {string.frequency} Hz
                       </span>
-                    </div>
-                  )}
-                  
-                  {/* Vibration effect when active */}
-                  {isActive && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-full h-8 bg-green-400/20 rounded-full animate-pulse"></div>
                     </div>
                   )}
                 </div>

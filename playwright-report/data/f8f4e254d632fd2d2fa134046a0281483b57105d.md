@@ -1,0 +1,133 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: statistics.spec.ts >> Statistics Page Tests >> skill progress bars are visible
+- Location: tests/statistics.spec.ts:61:3
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: locator('[style*="width"]').first()
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('[style*="width"]').first()
+
+```
+
+# Test source
+
+```ts
+  1   | import { test, expect } from '@playwright/test';
+  2   | 
+  3   | test.describe('Statistics Page Tests', () => {
+  4   |   test.beforeEach(async ({ page }) => {
+  5   |     await page.goto('/statistics');
+  6   |   });
+  7   | 
+  8   |   test('statistics page loads with correct heading', async ({ page }) => {
+  9   |     await expect(page.getByText('Your Progress')).toBeVisible();
+  10  |     await expect(page.getByText('Track your violin learning journey')).toBeVisible();
+  11  |   });
+  12  | 
+  13  |   test('overview cards are displayed', async ({ page }) => {
+  14  |     await expect(page.getByText('Total Practice')).toBeVisible();
+  15  |     await expect(page.getByText('Notes Played')).toBeVisible();
+  16  |     await expect(page.getByText('Accuracy')).toBeVisible();
+  17  |     await expect(page.getByText('Current Streak')).toBeVisible();
+  18  |   });
+  19  | 
+  20  |   test('practice time card shows data', async ({ page }) => {
+  21  |     await expect(page.getByText('⏱️')).toBeVisible();
+  22  |     await expect(page.getByText('Lifetime practice time')).toBeVisible();
+  23  |   });
+  24  | 
+  25  |   test('notes played card shows data', async ({ page }) => {
+  26  |     await expect(page.getByText('🎵')).toBeVisible();
+  27  |     await expect(page.getByText('Total notes practiced')).toBeVisible();
+  28  |   });
+  29  | 
+  30  |   test('accuracy card shows data', async ({ page }) => {
+  31  |     await expect(page.getByText('🎯')).toBeVisible();
+  32  |     await expect(page.getByText('Overall accuracy')).toBeVisible();
+  33  |   });
+  34  | 
+  35  |   test('streak card shows data', async ({ page }) => {
+  36  |     await expect(page.getByText('🔥')).toBeVisible();
+  37  |     await expect(page.getByText('Keep it up!')).toBeVisible();
+  38  |   });
+  39  | 
+  40  |   test('lessons completed section is displayed', async ({ page }) => {
+  41  |     await expect(page.getByText('Lessons Completed')).toBeVisible();
+  42  |     await expect(page.getByText('Total Completed')).toBeVisible();
+  43  |     await expect(page.getByText('Total XP Earned')).toBeVisible();
+  44  |     await expect(page.getByText('Songs Completed')).toBeVisible();
+  45  |   });
+  46  | 
+  47  |   test('recent activity section is displayed', async ({ page }) => {
+  48  |     await expect(page.getByText('Recent Activity')).toBeVisible();
+  49  |   });
+  50  | 
+  51  |   test('skills progress section is displayed', async ({ page }) => {
+  52  |     await expect(page.getByText('Skills Progress')).toBeVisible();
+  53  |     await expect(page.getByText('Note Reading')).toBeVisible();
+  54  |     await expect(page.getByText('Intonation')).toBeVisible();
+  55  |     await expect(page.getByText('Rhythm')).toBeVisible();
+  56  |     await expect(page.getByText('Bowing Technique')).toBeVisible();
+  57  |     await expect(page.getByText('Scales')).toBeVisible();
+  58  |     await expect(page.getByText('Sight Reading')).toBeVisible();
+  59  |   });
+  60  | 
+  61  |   test('skill progress bars are visible', async ({ page }) => {
+  62  |     // Check for progress bars (they should have width styles)
+  63  |     const progressBars = page.locator('[style*="width"]');
+> 64  |     await expect(progressBars.first()).toBeVisible();
+      |                                        ^ Error: expect(locator).toBeVisible() failed
+  65  |   });
+  66  | 
+  67  |   test('achievements section is displayed', async ({ page }) => {
+  68  |     await expect(page.getByText('Achievements')).toBeVisible();
+  69  |     await expect(page.getByText('First Note')).toBeVisible();
+  70  |     await expect(page.getByText('Sharp Shooter')).toBeVisible();
+  71  |     await expect(page.getByText('Week Warrior')).toBeVisible();
+  72  |   });
+  73  | 
+  74  |   test('practice tips section is displayed', async ({ page }) => {
+  75  |     await expect(page.getByText('💡 Practice Tips')).toBeVisible();
+  76  |     await expect(page.getByText('Aim for at least 15-30 minutes of practice daily')).toBeVisible();
+  77  |   });
+  78  | 
+  79  |   test('achievement badges are displayed', async ({ page }) => {
+  80  |     await expect(page.getByText('🎻')).toBeVisible();
+  81  |     await expect(page.getByText('🎯')).toBeVisible();
+  82  |     await expect(page.getByText('🔥')).toBeVisible();
+  83  |   });
+  84  | 
+  85  |   test('page is responsive on mobile', async ({ page }) => {
+  86  |     await page.setViewportSize({ width: 375, height: 667 });
+  87  |     await page.goto('/statistics');
+  88  |     
+  89  |     await expect(page.getByText('Your Progress')).toBeVisible();
+  90  |     await expect(page.getByText('Total Practice')).toBeVisible();
+  91  |   });
+  92  | 
+  93  |   test('page is responsive on tablet', async ({ page }) => {
+  94  |     await page.setViewportSize({ width: 768, height: 1024 });
+  95  |     await page.goto('/statistics');
+  96  |     
+  97  |     await expect(page.getByText('Your Progress')).toBeVisible();
+  98  |     await expect(page.getByText('Total Practice')).toBeVisible();
+  99  |   });
+  100 | });
+  101 | 
+```

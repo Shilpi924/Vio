@@ -1,0 +1,92 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: settings.spec.ts >> Settings Page Tests >> save button is present
+- Location: tests/settings.spec.ts:46:3
+
+# Error details
+
+```
+Error: expect(received).toBeTruthy()
+
+Received: false
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | 
+  3  | test.describe('Settings Page Tests', () => {
+  4  |   test.beforeEach(async ({ page }) => {
+  5  |     await page.goto('/settings');
+  6  |   });
+  7  | 
+  8  |   test('settings page loads with correct heading', async ({ page }) => {
+  9  |     await expect(page.getByText('Settings')).toBeVisible();
+  10 |   });
+  11 | 
+  12 |   test('audio settings section is displayed', async ({ page }) => {
+  13 |     const audioHeading = page.getByText('Audio');
+  14 |     const volumeHeading = page.getByText('Volume');
+  15 |     const soundHeading = page.getByText('Sound');
+  16 |     const isVisible = await audioHeading.isVisible() || await volumeHeading.isVisible() || await soundHeading.isVisible();
+  17 |     expect(isVisible).toBeTruthy();
+  18 |   });
+  19 | 
+  20 |   test('display settings section is displayed', async ({ page }) => {
+  21 |     const displayHeading = page.getByText('Display');
+  22 |     const appearanceHeading = page.getByText('Appearance');
+  23 |     const themeHeading = page.getByText('Theme');
+  24 |     const isVisible = await displayHeading.isVisible() || await appearanceHeading.isVisible() || await themeHeading.isVisible();
+  25 |     expect(isVisible).toBeTruthy();
+  26 |   });
+  27 | 
+  28 |   test('profile settings section is displayed', async ({ page }) => {
+  29 |     const profileHeading = page.getByText('Profile');
+  30 |     const accountHeading = page.getByText('Account');
+  31 |     const isVisible = await profileHeading.isVisible() || await accountHeading.isVisible();
+  32 |     expect(isVisible).toBeTruthy();
+  33 |   });
+  34 | 
+  35 |   test('settings controls are interactive', async ({ page }) => {
+  36 |     // Check for various input types
+  37 |     const sliders = page.locator('input[type="range"]');
+  38 |     const checkboxes = page.locator('input[type="checkbox"]');
+  39 |     const selects = page.locator('select');
+  40 |     
+  41 |     // At least one control should be present
+  42 |     const hasControls = await sliders.count() > 0 || await checkboxes.count() > 0 || await selects.count() > 0;
+  43 |     expect(hasControls).toBeTruthy();
+  44 |   });
+  45 | 
+  46 |   test('save button is present', async ({ page }) => {
+  47 |     const saveButton = page.getByText('Save');
+  48 |     const applyButton = page.getByText('Apply');
+  49 |     const anyButton = page.getByRole('button').first();
+  50 |     const isVisible = await saveButton.isVisible() || await applyButton.isVisible() || await anyButton.isVisible();
+> 51 |     expect(isVisible).toBeTruthy();
+     |                       ^ Error: expect(received).toBeTruthy()
+  52 |   });
+  53 | 
+  54 |   test('page is responsive on mobile', async ({ page }) => {
+  55 |     await page.setViewportSize({ width: 375, height: 667 });
+  56 |     await page.goto('/settings');
+  57 |     
+  58 |     await expect(page.getByText('Settings')).toBeVisible();
+  59 |   });
+  60 | 
+  61 |   test('page is responsive on tablet', async ({ page }) => {
+  62 |     await page.setViewportSize({ width: 768, height: 1024 });
+  63 |     await page.goto('/settings');
+  64 |     
+  65 |     await expect(page.getByText('Settings')).toBeVisible();
+  66 |   });
+  67 | });
+  68 | 
+```
