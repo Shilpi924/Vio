@@ -1,24 +1,37 @@
-import { useState } from 'react';
-import { Upload, Music, Link as LinkIcon, AlertCircle, Play } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, Music, Link as LinkIcon, AlertCircle, Play, Search, Filter } from 'lucide-react';
 import { OSMDViewer } from '../components/OSMDViewer';
 import { useNavigate } from 'react-router-dom';
-
-const SAMPLE_PUBLIC_DOMAIN_SCORES = [
-  {
-    title: 'Twinkle Twinkle Little Star',
-    composer: 'Traditional',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  }
-  // Ideally, you would fetch a JSON list from an external public domain API here.
-];
+import { publicDomainAPI, PublicDomainScore } from '../services/PublicDomainAPI';
 
 export default function SongUploadPage() {
   const [xmlContent, setXmlContent] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [isRendering, setIsRendering] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // API Catalog State
+  const [scores, setScores] = useState<PublicDomainScore[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [difficultyFilter, setDifficultyFilter] = useState('All');
+  const [isSearching, setIsSearching] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      setIsSearching(true);
+      try {
+        const results = await publicDomainAPI.searchScores(searchQuery, difficultyFilter);
+        setScores(results);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+    fetchScores();
+  }, [searchQuery, difficultyFilter]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -81,7 +94,7 @@ export default function SongUploadPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* File Upload Card */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden h-[400px]">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent" />
             <div className="relative z-10 w-full">
               <Upload size={48} className="mx-auto mb-4 text-purple-400" />
@@ -102,28 +115,56 @@ export default function SongUploadPage() {
           </div>
 
           {/* External API Card */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden h-[400px] flex flex-col">
              <div className="absolute inset-0 bg-gradient-to-bl from-blue-900/20 to-transparent" />
-             <div className="relative z-10">
+             <div className="relative z-10 flex flex-col h-full">
                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                  <LinkIcon className="text-blue-400" /> Public Domain API
                </h2>
-               <p className="text-gray-400 mb-6">Instantly load free scores from external open libraries.</p>
                
-               <div className="space-y-3">
-                 {SAMPLE_PUBLIC_DOMAIN_SCORES.map((score, idx) => (
-                   <button
-                     key={idx}
-                     onClick={() => loadFromAPI(score.url, score.title)}
-                     className="w-full flex items-center justify-between p-4 bg-gray-800/50 hover:bg-gray-800 rounded-xl border border-gray-700/50 transition-all group"
-                   >
-                     <div className="text-left">
-                       <p className="font-bold text-gray-200">{score.title}</p>
-                       <p className="text-sm text-gray-500">{score.composer}</p>
-                     </div>
-                     <Play className="text-gray-600 group-hover:text-blue-400 transition-colors" />
-                   </button>
-                 ))}
+               <div className="flex gap-2 mb-4">
+                 <div className="relative flex-1">
+                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                   <input
+                     type="text"
+                     placeholder="Search composers, titles..."
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                   />
+                 </div>
+                 <select 
+                   value={difficultyFilter}
+                   onChange={(e) => setDifficultyFilter(e.target.value)}
+                   className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                 >
+                   <option value="All">All Levels</option>
+                   <option value="Beginner">Beginner</option>
+                   <option value="Intermediate">Intermediate</option>
+                   <option value="Advanced">Advanced</option>
+                 </select>
+               </div>
+
+               <div className="space-y-2 overflow-y-auto flex-1 pr-2">
+                 {isSearching ? (
+                   <p className="text-gray-500 text-center py-4">Searching...</p>
+                 ) : scores.length === 0 ? (
+                   <p className="text-gray-500 text-center py-4">No scores found.</p>
+                 ) : (
+                   scores.map((score) => (
+                     <button
+                       key={score.id}
+                       onClick={() => loadFromAPI(score.url, score.title)}
+                       className="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl border border-gray-700/50 transition-all group"
+                     >
+                       <div className="text-left flex-1 min-w-0 pr-4">
+                         <p className="font-bold text-gray-200 truncate">{score.title}</p>
+                         <p className="text-xs text-gray-500 truncate">{score.composer} • {score.difficulty}</p>
+                       </div>
+                       <Play className="text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0" size={18} />
+                     </button>
+                   ))
+                 )}
                </div>
              </div>
           </div>
@@ -144,9 +185,6 @@ export default function SongUploadPage() {
                 <h3 className="text-2xl font-bold">{fileName}</h3>
                 <p className="text-gray-400">Preview and Play</p>
               </div>
-              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-green-900/50 transition-all flex items-center gap-2">
-                <Play size={18} /> Start Practice
-              </button>
             </div>
             
             <div className="bg-white rounded-xl overflow-hidden min-h-[500px]">
@@ -160,7 +198,6 @@ export default function SongUploadPage() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

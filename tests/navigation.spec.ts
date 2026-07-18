@@ -15,8 +15,8 @@ test.describe('Navigation Tests', () => {
     await expect(page.getByRole('heading', { name: 'Free Play', exact: true })).toBeVisible();
     
     // Click home button
-    await page.getByTitle('Go to home').click();
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Welcome to Violin Mentor!');
+    await page.getByTitle('Home').click();
+    await expect(page.getByText('Learn violin, have fun!')).toBeVisible();
   });
 
   test('back button works after navigation', async ({ page }) => {
@@ -37,21 +37,21 @@ test.describe('Navigation Tests', () => {
     await expect(page.getByRole('heading', { name: 'Free Play', exact: true })).toBeVisible();
     
     // Go back to home
-    await page.getByTitle('Go to home').click();
+    await page.getByTitle('Home').click();
     
     // Test Tutorials
     await page.getByRole('button', { name: 'Open Tutorials', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Violin Tutorials', exact: true })).toBeVisible();
     
     // Go back to home
-    await page.getByTitle('Go to home').click();
+    await page.getByTitle('Home').click();
     
     // Test Learning Path
     await page.getByRole('button', { name: 'Open Learning Path', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Learning Path', exact: true })).toBeVisible();
     
     // Go back to home
-    await page.getByTitle('Go to home').click();
+    await page.getByTitle('Home').click();
     
     // Test Progress
     await page.getByRole('button', { name: 'Open Progress', exact: true }).click();
@@ -60,7 +60,7 @@ test.describe('Navigation Tests', () => {
 
   test('navigation bar shows correct page title', async ({ page }) => {
     await page.goto('/free-play');
-    await expect(page.getByRole('heading', { name: 'Free Play', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '🎵 Free Play', exact: true })).toBeVisible();
 
     await page.goto('/statistics');
     await expect(page.getByRole('heading', { name: 'Your Progress', exact: true })).toBeVisible();

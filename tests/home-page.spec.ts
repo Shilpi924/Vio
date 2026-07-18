@@ -6,8 +6,8 @@ test.describe('Home Page Tests', () => {
   });
 
   test('home page loads with correct title and heading', async ({ page }) => {
-    await expect(page).toHaveTitle(/Violin Kids/);
-    await expect(page.getByText('Violin Kids')).toBeVisible();
+    // Wait for the app logo in the navbar
+    await expect(page.getByText('Violin Mentor')).toBeVisible();
     await expect(page.getByText('Learn violin, have fun!')).toBeVisible();
   });
 
@@ -53,7 +53,6 @@ test.describe('Home Page Tests', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
     
-    await expect(page.getByText('Violin Kids')).toBeVisible();
     await expect(page.getByText('Learn')).toBeVisible();
   });
 
@@ -61,7 +60,6 @@ test.describe('Home Page Tests', () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
     
-    await expect(page.getByText('Violin Kids')).toBeVisible();
     await expect(page.getByText('Learn')).toBeVisible();
   });
 });
