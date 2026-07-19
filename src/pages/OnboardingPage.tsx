@@ -36,7 +36,7 @@ const onboardingSteps = [
 
 export default function OnboardingPage({ onComplete }: OnboardingPageProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [hasPlayedBefore, setHasPlayedBefore] = useState<boolean | null>(null);
+  const [skillLevel, setSkillLevel] = useState<'beginner' | 'intermediate' | 'advanced' | null>(null);
 
   const handleNext = () => {
     if (currentStep < onboardingSteps.length - 1) {
@@ -52,15 +52,15 @@ export default function OnboardingPage({ onComplete }: OnboardingPageProps) {
     }
   };
 
-  const handleChoice = (choice: boolean) => {
-    setHasPlayedBefore(choice);
+  const handleChoice = (choice: 'beginner' | 'intermediate' | 'advanced') => {
+    setSkillLevel(choice);
     handleNext();
   };
 
   const completeOnboarding = () => {
     const data: PersonalizationData = {
       ageGroup: '9-12',
-      skillLevel: hasPlayedBefore ? 'intermediate' : 'beginner',
+      skillLevel: skillLevel || 'beginner',
       learningGoal: 'fun',
       practiceFrequency: 'few-times-week',
       favoriteGenres: [],
@@ -98,19 +98,25 @@ export default function OnboardingPage({ onComplete }: OnboardingPageProps) {
           <p className="text-xl text-gray-700 mb-8">{step.content}</p>
 
           {/* Choice buttons for step 2 */}
-          {step.hasChoice && hasPlayedBefore === null && (
+          {step.hasChoice && skillLevel === null && (
             <div className="space-y-4 mb-8">
               <button
-                onClick={() => handleChoice(true)}
-                className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105"
+                onClick={() => handleChoice('beginner')}
+                className="w-full py-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
               >
-                Yes, I've played before
+                <span>🐣</span> Beginner (Brand New)
               </button>
               <button
-                onClick={() => handleChoice(false)}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105"
+                onClick={() => handleChoice('intermediate')}
+                className="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
               >
-                No, this is my first time
+                <span>🎻</span> Intermediate (Some Experience)
+              </button>
+              <button
+                onClick={() => handleChoice('advanced')}
+                className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
+              >
+                <span>🔥</span> Advanced / Expert
               </button>
             </div>
           )}
