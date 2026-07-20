@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Upload, Music, Link as LinkIcon, AlertCircle, Play, Search, Filter } from 'lucide-react';
+import { Upload, Music, Link as LinkIcon, AlertCircle, Play, Search } from 'lucide-react';
 import { OSMDViewer } from '../components/OSMDViewer';
 import { useNavigate } from 'react-router-dom';
 import { publicDomainAPI, PublicDomainScore } from '../services/PublicDomainAPI';
@@ -69,7 +69,7 @@ export default function SongUploadPage() {
       
       const xml = await response.text();
       setXmlContent(xml);
-    } catch (err) {
+    } catch {
       setError('Failed to load score from external API.');
     } finally {
       setIsRendering(false);

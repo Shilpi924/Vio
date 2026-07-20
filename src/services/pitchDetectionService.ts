@@ -8,6 +8,7 @@ class PitchDetectionService {
   private audioContext: AudioContext | null = null;
   private analyzer: AnalyserNode | null = null;
   private mediaStreamSource: MediaStreamAudioSourceNode | null = null;
+  private mediaStream: MediaStream | null = null;
   private isRunning: boolean = false;
   private animationFrameId: number | null = null;
   private callback: PitchCallback | null = null;
@@ -33,6 +34,7 @@ class PitchDetectionService {
         autoGainControl: false,
         noiseSuppression: false
       } });
+      this.mediaStream = stream;
       
       this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
       this.analyzer = this.audioContext.createAnalyser();
@@ -43,6 +45,7 @@ class PitchDetectionService {
       this.tick();
     } catch (err) {
       console.error("Error accessing microphone:", err);
+      this.stop();
       throw err;
     }
   }
@@ -57,6 +60,10 @@ class PitchDetectionService {
       this.mediaStreamSource.disconnect();
       this.mediaStreamSource = null;
     }
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach((track) => track.stop());
+      this.mediaStream = null;
+    }
     if (this.analyzer) {
       this.analyzer.disconnect();
       this.analyzer = null;
@@ -65,6 +72,9 @@ class PitchDetectionService {
       this.audioContext.close();
       this.audioContext = null;
     }
+    this.callback = null;
+    this.lastDetectedNote = null;
+    this.noteHoldCounter = 0;
   }
 
   private tick = () => {

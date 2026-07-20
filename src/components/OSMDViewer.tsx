@@ -11,12 +11,59 @@ interface OSMDViewerProps {
 
 type PitchStatus = 'waiting' | 'perfect' | 'high' | 'low';
 
+const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+export const normalizePitch = (pitch: string): string => pitch.trim().replace(/♭/g, 'b').toUpperCase();
+
+const pitchToMidi = (pitch: string): number | null => {
+  const match = normalizePitch(pitch).match(/^([A-G])([#B]?)(-?\d+)$/);
+  if (!match) return null;
+
+  const [, letter, accidental, octaveText] = match;
+  const baseIndex = PITCH_CLASSES.indexOf(letter);
+  const accidentalOffset = accidental === '#' ? 1 : accidental === 'B' ? -1 : 0;
+  return (Number(octaveText) + 1) * 12 + baseIndex + accidentalOffset;
+};
+
+export const pitchesMatch = (expected: string, detected: string): boolean => {
+  if (normalizePitch(expected) === normalizePitch(detected)) return true;
+  const expectedMidi = pitchToMidi(expected);
+  return expectedMidi !== null && expectedMidi === pitchToMidi(detected);
+};
+
+export const comparePitches = (expected: string, detected: string): PitchStatus => {
+  if (pitchesMatch(expected, detected)) return 'perfect';
+
+  const expectedMidi = pitchToMidi(expected);
+  const detectedMidi = pitchToMidi(detected);
+  if (expectedMidi === null || detectedMidi === null) return 'waiting';
+  return detectedMidi > expectedMidi ? 'high' : 'low';
+};
+
+export const formatScorePitch = (pitch: any): string => {
+  // OSMD stores octaves relative to its internal octave (middle A is A1),
+  // so use its formatter with the MusicXML/standard-pitch offset when available.
+  if (typeof pitch.ToStringShort === 'function') {
+    return pitch.ToStringShort(3);
+  }
+
+  const fundamental = pitch.FundamentalNote ?? pitch.fundamentalNote ?? pitch.Step ?? 'C';
+  const fundamentalNames: Record<number, string> = { 0: 'C', 2: 'D', 4: 'E', 5: 'F', 7: 'G', 9: 'A', 11: 'B' };
+  const key = typeof fundamental === 'number' ? fundamentalNames[fundamental] ?? 'C' : String(fundamental);
+  const alteration = pitch.AccidentalHalfTones ?? pitch.Alteration ?? pitch.alteration ?? 0;
+  const octave = pitch.Octave ?? pitch.octave ?? 4;
+  const accidental = alteration === 1 ? '#' : alteration === -1 ? 'b' : '';
+  return `${key}${accidental}${octave}`;
+};
+
 export function OSMDViewer({ xmlStr, onReady }: OSMDViewerProps) {
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const isPlayingRef = useRef(false);
   const playbackRef = useRef<NodeJS.Timeout | null>(null);
+  const expectedPitchRef = useRef('-');
+  const advancePracticeRef = useRef<() => void>(() => undefined);
   
   // Practice Mode State
   const [isPracticeMode, setIsPracticeMode] = useState(false);
@@ -74,6 +121,24 @@ export function OSMDViewer({ xmlStr, onReady }: OSMDViewerProps) {
       setIsPracticeMode(false);
       isPracticeModeRef.current = false;
     }
+    expectedPitchRef.current = '-';
+  };
+
+  const finishPlayback = () => {
+    setIsPlaying(false);
+    isPlayingRef.current = false;
+    if (playbackRef.current) {
+      clearTimeout(playbackRef.current);
+      playbackRef.current = null;
+    }
+    osmdRef.current?.cursor.hide();
+
+    if (isPracticeModeRef.current) {
+      pitchDetectionService.stop();
+      setIsPracticeMode(false);
+      isPracticeModeRef.current = false;
+    }
+    expectedPitchRef.current = '-';
   };
 
   const togglePlayback = async (practice: boolean = false) => {
@@ -100,6 +165,15 @@ export function OSMDViewer({ xmlStr, onReady }: OSMDViewerProps) {
       try {
         await pitchDetectionService.start((noteName: string) => {
           setDetectedPitch(noteName);
+          const expectedPitch = expectedPitchRef.current;
+          if (expectedPitch === '-') return;
+
+          const status = comparePitches(expectedPitch, noteName);
+          setPitchStatus(status);
+          if (status === 'perfect') {
+            expectedPitchRef.current = '-';
+            advancePracticeRef.current();
+          }
         });
       } catch (err) {
         console.error('Mic access denied', err);
@@ -119,7 +193,7 @@ export function OSMDViewer({ xmlStr, onReady }: OSMDViewerProps) {
 
     const playNextNote = () => {
       if (!osmdRef.current || osmdRef.current.cursor.iterator.EndReached || !isPlayingRef.current) {
-        stopPlayback();
+        finishPlayback();
         return;
       }
 
@@ -128,57 +202,37 @@ export function OSMDViewer({ xmlStr, onReady }: OSMDViewerProps) {
         const note = notes[0];
         if (note.Pitch) {
           const pitchObj = note.Pitch as any;
-          const key = pitchObj.fundamentalNote !== undefined ? pitchObj.fundamentalNote : pitchObj.Step?.toString() || 'C';
-          const alter = pitchObj.Alteration || pitchObj.alteration || 0;
-          const octave = pitchObj.Octave || pitchObj.octave || 4;
-          
-          let acc = '';
-          if (alter === 1) acc = '#';
-          if (alter === -1) acc = 'b';
-          
-          const pitchStr = `${key}${acc}${octave}`;
+          const pitchStr = formatScorePitch(pitchObj);
           
           if (!isPracticeModeRef.current) {
             audioService.playNote(pitchStr, '8n');
           } else {
             setCurrentExpectedPitch(pitchStr);
-            // In a real app we'd compare frequencies or mapped string values over the note duration
-            // For now, we update state to indicate we are waiting for pitch
+            expectedPitchRef.current = pitchStr;
             setPitchStatus('waiting');
+            return;
           }
         }
       }
 
       osmdRef.current.cursor.next();
 
-      // Extend duration in practice mode to give user time to play
-      const duration = isPracticeModeRef.current ? 1500 : 500;
-      playbackRef.current = setTimeout(playNextNote, duration);
+      if (isPracticeModeRef.current) {
+        // Skip rests and empty cursor positions without advancing playable notes on a timer.
+        playNextNote();
+      } else {
+        playbackRef.current = setTimeout(playNextNote, 500);
+      }
+    };
+
+    advancePracticeRef.current = () => {
+      if (!isPracticeModeRef.current || !isPlayingRef.current || !osmdRef.current) return;
+      osmdRef.current.cursor.next();
+      playNextNote();
     };
 
     playNextNote();
   };
-
-  // Compare expected vs detected in practice mode
-  useEffect(() => {
-    if (!isPracticeMode || currentExpectedPitch === '-') return;
-    
-    // Very basic comparison logic
-    if (detectedPitch === '-' || detectedPitch === '') {
-      setPitchStatus('waiting');
-    } else {
-      // Remove octave for easier comparison (e.g. C#4 -> C#)
-      const expectedBase = currentExpectedPitch.replace(/[0-9]/g, '');
-      const detectedBase = detectedPitch.replace(/[0-9]/g, '');
-      
-      if (expectedBase === detectedBase) {
-        setPitchStatus('perfect');
-      } else {
-        // Ideally map notes to indices to determine high/low
-        setPitchStatus('high'); // Placeholder logic
-      }
-    }
-  }, [detectedPitch, currentExpectedPitch, isPracticeMode]);
 
   return (
     <div className="flex flex-col h-full w-full relative">
