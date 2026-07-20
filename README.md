@@ -61,6 +61,29 @@ npm run dev
 ```
 The app will run locally at `http://localhost:5173`.
 
+To enable the Claude-powered violin chatbot, create `.env.local` in the project
+root and add your Anthropic API key:
+
+```bash
+ANTHROPIC_API_KEY=your_anthropic_api_key
+```
+
+Restart the development server after changing `.env.local`. Keep the key
+server-side and never rename it with a `VITE_` prefix, which would expose it to
+the browser bundle.
+
+For Firebase Hosting, store the same key in Firebase Secret Manager and deploy
+the Hosting site and Cloud Function:
+
+```bash
+npx firebase use --add
+npx firebase functions:secrets:set ANTHROPIC_API_KEY
+npm run firebase:deploy
+```
+
+The `/api/chat` Hosting rewrite sends production requests to the `chat` Cloud
+Function, so the key remains server-side after deployment.
+
 ### Testing
 
 Violin Mentor ships with comprehensive unit tests with near-perfect business logic coverage.

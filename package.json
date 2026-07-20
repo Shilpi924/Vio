@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:functions": "npm --prefix functions run check",
+    "firebase:emulators": "npm run build && npx firebase emulators:start",
+    "firebase:deploy": "npm run build && npm run build:functions && npx firebase deploy",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
