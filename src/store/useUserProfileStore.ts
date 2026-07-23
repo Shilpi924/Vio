@@ -274,10 +274,16 @@ export const useUserProfileStore = create<UserProfileState>()(
       },
       
       updateStreak: () => {
-        // Simple streak update (would need date tracking for real streak logic)
         set((state) => {
           const active = state.profiles[state.activeProfileId];
-          const newStreak = active.currentStreak + 1;
+          const today = new Date();
+          const todayKey = today.toISOString().slice(0, 10);
+          if (active.lastPracticeDate === todayKey) return state;
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+          const newStreak = active.lastPracticeDate === yesterday.toISOString().slice(0, 10)
+            ? active.currentStreak + 1
+            : 1;
           return {
             profiles: {
               ...state.profiles,
@@ -285,6 +291,7 @@ export const useUserProfileStore = create<UserProfileState>()(
                 ...active,
                 currentStreak: newStreak,
                 longestStreak: Math.max(active.longestStreak, newStreak),
+                lastPracticeDate: todayKey,
               }
             }
           };

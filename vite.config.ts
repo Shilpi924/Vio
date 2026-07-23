@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const MAX_REQUEST_BYTES = 50_000;
 
@@ -8,6 +9,11 @@ type ChatMessage = {
   role: 'user' | 'assistant';
   content: string;
 };
+
+function normalizeLearnerContext(value: unknown): string {
+  if (!value || typeof value !== 'object') return '';
+  return JSON.stringify(value).slice(0, 2_000);
+}
 
 function claudeChatPlugin(apiKey: string): Plugin {
   return {
@@ -42,7 +48,7 @@ function claudeChatPlugin(apiKey: string): Plugin {
           }
 
           try {
-            const parsed = JSON.parse(body) as { messages?: ChatMessage[] };
+            const parsed = JSON.parse(body) as { messages?: ChatMessage[]; learnerContext?: unknown };
             const messages = parsed.messages
               ?.filter((message): message is ChatMessage =>
                 (message.role === 'user' || message.role === 'assistant') &&
@@ -62,7 +68,7 @@ function claudeChatPlugin(apiKey: string): Plugin {
             const result = await anthropic.messages.create({
               model: 'claude-haiku-4-5',
               max_tokens: 500,
-              system: 'You are Violin Mentor, a friendly and encouraging violin teacher for children and families. Give accurate, age-appropriate, concise guidance about violin technique, music theory, practice, and musical learning. Prioritize safety and recommend an in-person teacher for pain, injury, or technique that needs physical assessment.',
+              system: `You are Violin Mentor, a friendly and encouraging violin teacher for children and families. Give accurate, age-appropriate, concise guidance about violin technique, music theory, practice, and musical learning. Use recorded learner context only when relevant and never invent progress. Prioritize safety and recommend an in-person teacher for pain, injury, or technique that needs physical assessment.\nLearner context: ${normalizeLearnerContext(parsed.learnerContext) || 'No recorded practice context yet.'}`,
               messages,
             });
             const reply = result.content
@@ -97,6 +103,35 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['og.png', 'icon-192.png', 'icon-512.png'],
+        manifest: {
+          name: 'Violin Mentor',
+          short_name: 'Violin Mentor',
+          description: 'Purposeful violin practice with guided lessons and microphone feedback.',
+          theme_color: '#2e1065',
+          background_color: '#fffdf8',
+          display: 'standalone',
+          start_url: '/',
+          scope: '/',
+          categories: ['education', 'music'],
+          icons: [
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          ],
+        },
+        workbox: {
+          navigateFallback: '/index.html',
+          maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/www\.youtube\.com\//,
+              handler: 'NetworkOnly',
+            },
+          ],
+        },
+      }),
       claudeChatPlugin(env.ANTHROPIC_API_KEY),
     ],
     build: {

@@ -1,92 +1,101 @@
+import { ArrowRight, BookOpen, Headphones, Music2, Target, TimerReset } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
-import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const statistics = useAppStore((state) => state.statistics);
-  const getActiveProfile = useUserProfileStore((state) => state.getActiveProfile);
-  const userProfile = getActiveProfile();
+  const sessions = useAppStore((state) => state.practiceSessions);
+  const profile = useUserProfileStore((state) => state.profiles[state.activeProfileId]);
+  const nextPath = profile?.completedLessons.length ? '/lessons' : '/beginner-path';
 
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m`;
+    const minutes = Math.round(seconds / 60);
+    return minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes}m`;
   };
 
-  // Simplified to 3 main actions for kids
-  const mainActions = [
-    { path: '/beginner-path', title: 'Learn', icon: '�', subtitle: 'Start from scratch', color: 'from-blue-400 to-blue-600' },
-    { path: '/free-play', title: 'Play', icon: '🎵', subtitle: 'Free violin time', color: 'from-purple-400 to-purple-600' },
-    { path: '/lessons', title: 'Songs', icon: '🎶', subtitle: 'Learn music', color: 'from-green-400 to-green-600' },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-6">
-      <div className="max-w-3xl mx-auto">
-        {/* Simple, fun header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-gray-800 mb-2">� Violin Kids</h1>
-          <p className="text-xl text-gray-600">Learn violin, have fun!</p>
-        </div>
-
-        {/* Simple progress badge */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white rounded-full px-6 py-3 shadow-md flex items-center gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{formatTime(statistics.totalPracticeTime)}</div>
-              <div className="text-xs text-gray-500">Practice</div>
-            </div>
-            <div className="w-px h-8 bg-gray-200"></div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-500">🔥 {statistics.streak}</div>
-              <div className="text-xs text-gray-500">Days</div>
+    <main className="min-h-[calc(100vh-4rem)] bg-[#fffdf8] text-slate-950">
+      <section className="border-b border-stone-200 px-5 py-12 sm:py-16">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-purple-700">Hear it. Fix it. Play it.</p>
+            <h1 className="mt-4 max-w-3xl text-5xl font-black tracking-tight sm:text-6xl">
+              A clearer path from first sound to confident performance.
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
+              Violin Mentor combines guided lessons, microphone feedback and focused repetition so every practice session has a purpose.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button type="button" onClick={() => navigate(nextPath)} className="btn-primary bg-purple-950 hover:bg-purple-900">
+                {profile?.completedLessons.length ? 'Continue practicing' : 'Start the beginner path'}
+                <ArrowRight size={18} aria-hidden="true" />
+              </button>
+              <button type="button" onClick={() => navigate('/tuner')} className="btn-secondary">
+                Tune my violin
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* 3 Big, Colorful Buttons */}
-        <div className="grid grid-cols-1 gap-4 mb-8">
-          {mainActions.map((action) => (
-            <button
-              key={action.path}
-              onClick={() => navigate(action.path)}
-              className={`bg-gradient-to-r ${action.color} text-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95`}
-            >
-              <div className="text-5xl mb-2">{action.icon}</div>
-              <div className="text-3xl font-bold">{action.title}</div>
-              <div className="text-lg opacity-90">{action.subtitle}</div>
-            </button>
-          ))}
+          <aside className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-2xl sm:p-8">
+            <p className="text-sm font-bold uppercase tracking-widest text-purple-300">Your practice signal</p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {[
+                ['Practice', formatTime(statistics.totalPracticeTime)],
+                ['Accuracy', `${statistics.accuracy}%`],
+                ['Sessions', String(sessions.length)],
+                ['Lessons', String(profile?.completedLessons.length ?? 0)],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl bg-white/10 p-4">
+                  <p className="text-sm text-slate-300">{label}</p>
+                  <p className="mt-1 text-3xl font-black">{value}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-sm leading-6 text-slate-300">
+              Progress appears only after recorded practice—never from sample or invented activity.
+            </p>
+          </aside>
         </div>
+      </section>
 
-        {/* Simple call to action */}
-        <div className="bg-white rounded-3xl shadow-lg p-8 text-center">
-          {!userProfile || userProfile.completedLessons.length === 0 ? (
-            <>
-              <p className="text-2xl font-bold text-gray-800 mb-2">Ready to play your first song? 🎵</p>
+      <section className="px-5 py-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-black uppercase tracking-widest text-purple-700">Practice studio</p>
+              <h2 className="mt-2 text-3xl font-black">Choose what you need today</h2>
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              ['/beginner-path', 'Learn step by step', 'Build safe fundamentals in a clear order.', BookOpen],
+              ['/lessons', 'Practice a song', 'Listen, play and receive note-by-note feedback.', Music2],
+              ['/tuner', 'Tune accurately', 'Use the microphone to tune each open string.', Target],
+              ['/ear-training', 'Train your ear', 'Recognize pitches and intervals by sound.', Headphones],
+              ['/rhythm-training', 'Strengthen rhythm', 'Tap patterns and build steady timing.', TimerReset],
+              ['/statistics', 'Review progress', 'See sessions, accuracy and difficult notes.', Target],
+            ].map(([path, title, description, Icon]) => (
               <button
-                onClick={() => navigate('/beginner-path')}
-                className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-4 rounded-2xl font-bold text-xl hover:shadow-lg transition-all hover:scale-105"
+                type="button"
+                key={String(path)}
+                onClick={() => navigate(String(path))}
+                className="group rounded-2xl border border-stone-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-purple-300 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-purple-700"
               >
-                Start Learning →
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-purple-100 text-purple-900">
+                  <Icon size={22} aria-hidden="true" />
+                </span>
+                <span className="mt-5 block text-xl font-black">{String(title)}</span>
+                <span className="mt-2 block leading-6 text-slate-600">{String(description)}</span>
+                <span className="mt-5 flex items-center gap-2 text-sm font-bold text-purple-800">
+                  Open <ArrowRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
+                </span>
               </button>
-            </>
-          ) : (
-            <>
-              <p className="text-2xl font-bold text-gray-800 mb-2">Great job! Keep going! ⭐</p>
-              <p className="text-gray-600 mb-4">{userProfile.completedLessons.length} lessons done</p>
-              <button
-                onClick={() => navigate('/beginner-path')}
-                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-4 rounded-2xl font-bold text-xl hover:shadow-lg transition-all hover:scale-105"
-              >
-                Continue →
-              </button>
-            </>
-          )}
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

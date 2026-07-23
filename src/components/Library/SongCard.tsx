@@ -18,9 +18,6 @@ export function SongCard({ lesson, isCompleted, onClick }: SongCardProps) {
     }
   };
 
-  // Fake image for demo purposes since we don't have real covers in our types
-  const coverImage = `https://images.unsplash.com/photo-1460036521480-c1baf97087e5?auto=format&fit=crop&w=400&q=80`;
-
   const duration = Math.round((lesson.notes?.length || 50) * 60 / (lesson.tempo || 60));
 
   return (
@@ -28,13 +25,16 @@ export function SongCard({ lesson, isCompleted, onClick }: SongCardProps) {
       whileHover={{ scale: 1.05, y: -5 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="group relative h-[300px] w-[220px] rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-shadow flex-shrink-0"
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') onClick();
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Practice ${lesson.title}`}
+      className="group relative h-[300px] w-[220px] rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-shadow flex-shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-300"
     >
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-        style={{ backgroundImage: `url(${coverImage})` }}
-      />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(216,180,254,0.32),_transparent_38%),linear-gradient(145deg,#272033,#111827)]" />
+      <div className="absolute left-5 top-16 text-7xl opacity-25 transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110" aria-hidden="true">♪</div>
       
       {/* Dark Overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />

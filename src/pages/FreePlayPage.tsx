@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { audioService } from '../services/audioService';
 
 const violinStrings = [
   { name: 'G', note: 'G3', color: 'from-amber-400 to-amber-600' },
@@ -13,9 +14,11 @@ export default function FreePlayPage() {
   const [activeString, setActiveString] = useState<string | null>(null);
   const [volume, setVolume] = useState(0.5);
 
-  const playString = (stringName: string) => {
+  const playString = async (stringName: string, note: string) => {
     setActiveString(stringName);
-    // In a real app, this would use Web Audio API to play the note
+    await audioService.initialize();
+    audioService.setVolume(volume);
+    audioService.playNote(note, '2n');
     setTimeout(() => setActiveString(null), 200);
   };
 
@@ -24,7 +27,7 @@ export default function FreePlayPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">� Free Play</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">🎻 Free Play</h1>
           <p className="text-lg text-gray-600">Tap the strings and make music!</p>
         </div>
 
@@ -32,18 +35,20 @@ export default function FreePlayPage() {
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
           <div className="space-y-4">
             {violinStrings.map((string) => (
-              <div
+              <button
+                type="button"
                 key={string.name}
-                onClick={() => playString(string.name)}
-                className={`cursor-pointer transition-all hover:scale-105 active:scale-95 bg-gradient-to-r ${string.color} rounded-2xl p-6 text-white shadow-md ${
+                onClick={() => void playString(string.name, string.note)}
+                className={`w-full cursor-pointer text-left transition-all hover:scale-[1.02] active:scale-[0.99] bg-gradient-to-r ${string.color} rounded-2xl p-6 text-white shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-700 ${
                   activeString === string.name ? 'ring-4 ring-white scale-105' : ''
                 }`}
+                aria-label={`Play ${string.name} string, ${string.note}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="text-4xl font-bold">{string.name} String</div>
                   <div className="text-2xl">{string.note}</div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -54,6 +59,7 @@ export default function FreePlayPage() {
             <span className="text-2xl">🔊</span>
             <div className="flex-1">
               <input
+                aria-label="Free play volume"
                 type="range"
                 min="0"
                 max="100"

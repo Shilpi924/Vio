@@ -4,7 +4,21 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-[#fffdf8] text-gray-900 antialiased;
+  }
+
+  :focus-visible {
+    outline: 3px solid #7e22ce;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   .dark body {
@@ -14,11 +28,11 @@
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-blue-500 text-white rounded-xl font-semibold shadow-lg hover:bg-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 min-h-[44px] min-w-[44px];
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl font-semibold shadow-lg hover:bg-blue-600 transition-all duration-200 hover:scale-[1.02] active:scale-[0.99] min-h-[44px] min-w-[44px];
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold shadow-lg hover:bg-gray-300 transition-all duration-200 hover:scale-105 active:scale-95 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 min-h-[44px] min-w-[44px];
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 text-gray-800 rounded-xl font-semibold shadow-lg hover:bg-gray-300 transition-all duration-200 hover:scale-[1.02] active:scale-[0.99] dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 min-h-[44px] min-w-[44px];
   }
 
   .card {

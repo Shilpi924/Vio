@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState, Lesson, Settings, Statistics, MIDIDevice, LessonProgress } from '../types';
+import type { AppState, Lesson, Settings, Statistics, MIDIDevice, LessonProgress, PracticeSession } from '../types';
 
 interface AppStore extends AppState {
   // Practice session state
@@ -19,6 +19,8 @@ interface AppStore extends AppState {
   incrementPracticeTime: (seconds: number) => void;
   recordNotePlayed: (correct: boolean) => void;
   completeLesson: (lessonId: string) => void;
+  practiceSessions: PracticeSession[];
+  recordPracticeSession: (session: Omit<PracticeSession, 'id'>) => void;
 
   // MIDI
   midiDevices: MIDIDevice[];
@@ -129,6 +131,31 @@ export const useAppStore = create<AppStore>()(
               : [...state.statistics.songsCompleted, lessonId],
           },
         })),
+      practiceSessions: [],
+      recordPracticeSession: (session) =>
+        set((state) => {
+          const nextSession: PracticeSession = {
+            ...session,
+            id: `practice_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          };
+          const notesPlayed = state.statistics.notesPlayed + session.notesPlayed;
+          const correctNotes = state.statistics.correctNotes + session.correctNotes;
+          return {
+            practiceSessions: [nextSession, ...state.practiceSessions].slice(0, 100),
+            statistics: {
+              ...state.statistics,
+              totalPracticeTime: state.statistics.totalPracticeTime + session.durationSeconds,
+              notesPlayed,
+              correctNotes,
+              accuracy: notesPlayed > 0 ? Math.round((correctNotes / notesPlayed) * 100) : 0,
+              hardestMeasures: Array.from(new Set([
+                ...session.hardestNotes,
+                ...state.statistics.hardestMeasures,
+              ])).slice(0, 12),
+              lastPracticeDate: new Date(),
+            },
+          };
+        }),
 
       // MIDI
       midiDevices: [],
@@ -166,6 +193,7 @@ export const useAppStore = create<AppStore>()(
         statistics: state.statistics,
         lessonProgress: state.lessonProgress,
         customLessons: state.customLessons,
+        practiceSessions: state.practiceSessions,
       }),
     }
   )

@@ -1,63 +1,70 @@
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, db } from '../services/firebase';
 import type { User } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
 
 export function useCloudSync() {
   const profiles = useUserProfileStore((state) => state.profiles);
-  const [user, setUser] = useState<User | null>(auth?.currentUser ?? null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!auth || !db) return;
+    let unsubscribe: (() => void) | undefined;
+    let cancelled = false;
 
-    const firestore = db;
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      
-      if (currentUser) {
-        const fetchProfiles = async () => {
-          try {
-            const docRef = doc(firestore, 'users', currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              const data = docSnap.data();
-              if (data.profiles && Object.keys(data.profiles).length > 0) {
-                useUserProfileStore.setState((state) => ({
-                  profiles: { ...state.profiles, ...data.profiles },
-                  hasCompletedOnboarding: true
-                }));
+    void Promise.all([
+      import('firebase/auth'),
+      import('firebase/firestore'),
+      import('../services/firebase'),
+    ]).then(([{ onAuthStateChanged }, { doc, getDoc }, { auth, db }]) => {
+      if (cancelled || !auth || !db) return;
+      unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+        if (currentUser) {
+          void (async () => {
+            const docRef = doc(db, 'users', currentUser.uid);
+            try {
+              const docSnap = await getDoc(docRef);
+              if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.profiles && Object.keys(data.profiles).length > 0) {
+                  useUserProfileStore.setState((state) => ({
+                    profiles: { ...state.profiles, ...data.profiles },
+                    hasCompletedOnboarding: true,
+                  }));
+                }
               }
+            } catch (error) {
+              console.error('Failed to fetch cloud profiles', error);
             }
-          } catch (e) {
-            console.error('Failed to fetch cloud profiles', e);
-          }
-        };
-        fetchProfiles();
-      }
+          })();
+        }
+      });
     });
-    return unsubscribe;
+
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, []);
 
   useEffect(() => {
-    if (user && db) {
-      const firestore = db;
-      const syncToCloud = async () => {
+    if (!user) return;
+    const timeoutId = window.setTimeout(() => {
+      void Promise.all([
+        import('firebase/firestore'),
+        import('../services/firebase'),
+      ]).then(async ([{ doc, serverTimestamp, setDoc }, { db }]) => {
+        if (!db) return;
         try {
-          const docRef = doc(firestore, 'users', user.uid);
-          await setDoc(docRef, {
+          await setDoc(doc(db, 'users', user.uid), {
             profiles,
             schemaVersion: 1,
             updatedAt: serverTimestamp(),
           }, { merge: true });
-        } catch (e) {
-          console.error('Failed to sync to cloud', e);
+        } catch (error) {
+          console.error('Failed to sync cloud profiles', error);
         }
-      };
-      
-      const timeoutId = setTimeout(syncToCloud, 2000);
-      return () => clearTimeout(timeoutId);
-    }
+      });
+    }, 2000);
+    return () => window.clearTimeout(timeoutId);
   }, [profiles, user]);
 }

@@ -1,7 +1,7 @@
 import type { Lesson } from '../types';
 import type { ViolinString } from '../types';
 
-export const sampleLessons: Lesson[] = [
+const lessonCatalog: Lesson[] = [
   {
     id: 'twinkle-twinkle',
     title: 'Twinkle Twinkle Little Star',
@@ -2649,3 +2649,26 @@ export const sampleLessons: Lesson[] = [
     hasFullVersion: true,
   },
 ];
+
+// Only publish repertoire with a clear public-domain or original educational basis.
+// Contemporary arrangements remain out of the product until written licensing is recorded.
+const clearedLessonIds = new Set([
+  'twinkle-twinkle',
+  'mary-had-little-lamb',
+  'happy-birthday',
+  'ode-to-joy',
+  'jingle-bells',
+  'amazing-grace',
+  'baa-baa-black-sheep',
+  'row-row-row-your-boat',
+  'london-bridge',
+  'old-macdonald',
+  'frere-jacques',
+  'scales-g-major',
+  'scales-d-major',
+  'scales-a-major',
+  'open-strings',
+  'canon-in-d',
+]);
+
+export const sampleLessons: Lesson[] = lessonCatalog.filter((lesson) => clearedLessonIds.has(lesson.id));

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth, isFirebaseConfigured } from '../services/firebase';
 
 interface GoogleSignInProps {
   onSignIn: (user: { name: string; email: string; picture?: string }) => void;
@@ -6,35 +8,39 @@ interface GoogleSignInProps {
 
 export default function GoogleSignIn({ onSignIn }: GoogleSignInProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    
-    // Simulate Google Sign-In (replace with actual Google OAuth implementation)
-    // For real implementation, you would use:
-    // - @react-oauth/google package
-    // - Or firebase auth with Google provider
-    // - Or next-auth with Google provider
-    
-    setTimeout(() => {
-      // Mock user data - replace with actual Google user data
-      const mockUser = {
-        name: 'Demo User',
-        email: 'demo@example.com',
-        picture: 'https://ui-avatars.com/api/?name=Demo+User&background=random',
-      };
-      
-      onSignIn(mockUser);
+    setError('');
+    if (!isFirebaseConfigured || !auth) {
+      setError('Cloud sign-in is not configured for this deployment.');
       setIsLoading(false);
-    }, 1000);
+      return;
+    }
+
+    try {
+      const credential = await signInWithPopup(auth, new GoogleAuthProvider());
+      onSignIn({
+        name: credential.user.displayName || 'Learner',
+        email: credential.user.email || '',
+        picture: credential.user.photoURL || undefined,
+      });
+    } catch {
+      setError('Google sign-in did not complete. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <button
-      onClick={handleGoogleSignIn}
-      disabled={isLoading}
-      className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-    >
+    <div>
+      <button
+        type="button"
+        onClick={() => void handleGoogleSignIn()}
+        disabled={isLoading || !isFirebaseConfigured}
+        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+      >
       {isLoading ? (
         <div className="w-6 h-6 border-3 border-gray-400 border-t-transparent rounded-full animate-spin" />
       ) : (
@@ -60,6 +66,8 @@ export default function GoogleSignIn({ onSignIn }: GoogleSignInProps) {
           <span>Sign in with Google</span>
         </>
       )}
-    </button>
+      </button>
+      {error && <p role="alert" className="mt-2 text-sm text-red-700">{error}</p>}
+    </div>
   );
 }

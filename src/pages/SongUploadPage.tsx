@@ -41,6 +41,10 @@ export default function SongUploadPage() {
       setError('Please upload a valid .musicxml or .xml file.');
       return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('This score is larger than 5 MB. Please export a smaller MusicXML file.');
+      return;
+    }
 
     setFileName(file.name);
     setError(null);
@@ -48,7 +52,14 @@ export default function SongUploadPage() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      setXmlContent(e.target?.result as string);
+      const content = String(e.target?.result ?? '');
+      if (!/<score-(partwise|timewise)[\s>]/i.test(content) || /<!DOCTYPE|<!ENTITY/i.test(content)) {
+        setError('This file is not a supported, safe MusicXML score.');
+        setXmlContent(null);
+        setIsRendering(false);
+        return;
+      }
+      setXmlContent(content);
       setIsRendering(false);
     };
     reader.onerror = () => {
@@ -58,19 +69,14 @@ export default function SongUploadPage() {
     reader.readAsText(file);
   };
 
-  const loadFromAPI = async (url: string, title: string) => {
+  const loadFromCatalog = (score: PublicDomainScore) => {
     try {
       setIsRendering(true);
       setError(null);
-      setFileName(title);
-      
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch score');
-      
-      const xml = await response.text();
-      setXmlContent(xml);
+      setFileName(score.title);
+      setXmlContent(score.musicXml);
     } catch {
-      setError('Failed to load score from external API.');
+      setError('Failed to load this score.');
     } finally {
       setIsRendering(false);
     }
@@ -88,7 +94,7 @@ export default function SongUploadPage() {
           </button>
           <div>
             <h1 className="text-4xl font-bold">Import & Discover</h1>
-            <p className="text-gray-400">Play any song by importing MusicXML or exploring public domain scores.</p>
+            <p className="text-gray-400">Import MusicXML you are allowed to use, or explore a small curated public-domain starter set.</p>
           </div>
         </div>
 
@@ -119,7 +125,7 @@ export default function SongUploadPage() {
              <div className="absolute inset-0 bg-gradient-to-bl from-blue-900/20 to-transparent" />
              <div className="relative z-10 flex flex-col h-full">
                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                 <LinkIcon className="text-blue-400" /> Public Domain API
+                 <LinkIcon className="text-blue-400" /> Public-domain starters
                </h2>
                
                <div className="flex gap-2 mb-4">
@@ -154,12 +160,13 @@ export default function SongUploadPage() {
                    scores.map((score) => (
                      <button
                        key={score.id}
-                       onClick={() => loadFromAPI(score.url, score.title)}
+                      onClick={() => loadFromCatalog(score)}
                        className="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl border border-gray-700/50 transition-all group"
                      >
                        <div className="text-left flex-1 min-w-0 pr-4">
                          <p className="font-bold text-gray-200 truncate">{score.title}</p>
                          <p className="text-xs text-gray-500 truncate">{score.composer} • {score.difficulty}</p>
+                         <p className="text-xs text-gray-600 truncate">{score.provenance}</p>
                        </div>
                        <Play className="text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0" size={18} />
                      </button>

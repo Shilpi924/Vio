@@ -16,6 +16,7 @@ export interface UserProfile {
   totalPracticeTime: number; // in minutes
   currentStreak: number;
   longestStreak: number;
+  lastPracticeDate?: string;
   level: number;
   experiencePoints: number;
   achievements: string[];

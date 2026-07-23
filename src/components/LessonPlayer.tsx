@@ -1,18 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Lesson } from '../types';
 import { audioService } from '../services/audioService';
+import { pitchDetectionService } from '../services/pitchDetectionService';
 import SongVersionToggle from './SongVersionToggle';
+
+export interface LessonResult {
+  durationSeconds: number;
+  notesPlayed: number;
+  correctNotes: number;
+  hardestNotes: string[];
+}
 
 interface LessonPlayerProps {
   lesson: Lesson;
   onExit: () => void;
-  onComplete: () => void;
+  onComplete: (result: LessonResult) => void;
 }
 
 export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentNoteIndex, setCurrentNoteIndex] = useState(0);
   const [useFullVersion, setUseFullVersion] = useState(false);
+  const [isGuidedPractice, setIsGuidedPractice] = useState(false);
+  const [feedback, setFeedback] = useState('Choose Listen first, then start guided practice.');
+  const [attempts, setAttempts] = useState<Record<number, number>>({});
+  const [correctNotes, setCorrectNotes] = useState(0);
+  const [practiceTempo, setPracticeTempo] = useState(lesson.tempo);
+  const startedAtRef = useRef(Date.now());
+  const playingRef = useRef(false);
 
   const handleVersionChange = (useFull: boolean) => {
     setUseFullVersion(useFull);
@@ -25,34 +40,115 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
 
   const currentNotes = getCurrentNotes();
 
+  const normalizeNote = (note: string) => note.trim().toUpperCase().replace('♭', 'B');
+
+  useEffect(() => () => {
+    playingRef.current = false;
+    pitchDetectionService.stop();
+    audioService.stopAllNotes();
+  }, []);
+
   const handlePlay = async () => {
     if (!isPlaying) {
       setIsPlaying(true);
+      playingRef.current = true;
       try {
         // Initialize audio service
         await audioService.initialize();
         
         // Play the lesson notes
-        for (let i = currentNoteIndex; i < currentNotes.length; i++) {
+        for (let i = currentNoteIndex; i < currentNotes.length && playingRef.current; i++) {
           setCurrentNoteIndex(i);
           const note = currentNotes[i];
           audioService.playNote(note.note, note.duration);
           // Wait for note duration (convert beats to seconds)
-          await new Promise(resolve => setTimeout(resolve, (note.duration * 60 / lesson.tempo) * 1000));
+          await new Promise(resolve => setTimeout(resolve, (note.duration * 60 / practiceTempo) * 1000));
         }
-        setCurrentNoteIndex(0);
+        if (playingRef.current) setCurrentNoteIndex(0);
       } catch (error) {
         console.error('Error playing notes:', error);
       } finally {
+        playingRef.current = false;
         setIsPlaying(false);
       }
     }
   };
 
   const handleStop = () => {
+    playingRef.current = false;
     setIsPlaying(false);
     audioService.stopAllNotes();
+  };
+
+  const stopGuidedPractice = () => {
+    pitchDetectionService.stop();
+    setIsGuidedPractice(false);
+    setFeedback('Practice paused. Your progress is saved on this screen.');
+  };
+
+  const startGuidedPractice = async () => {
+    if (isGuidedPractice) {
+      stopGuidedPractice();
+      return;
+    }
+
+    startedAtRef.current = Date.now();
     setCurrentNoteIndex(0);
+    setAttempts({});
+    setCorrectNotes(0);
+    setPracticeTempo(lesson.tempo);
+    setFeedback(`Play ${currentNotes[0]?.note ?? 'the first note'}.`);
+
+    try {
+      await pitchDetectionService.start((detectedNote) => {
+        setCurrentNoteIndex((index) => {
+          const expected = currentNotes[index];
+          if (!expected) return index;
+
+          if (normalizeNote(detectedNote) === normalizeNote(expected.note)) {
+            setCorrectNotes((value) => value + 1);
+            setFeedback(index + 1 >= currentNotes.length
+              ? 'Excellent — guided practice complete.'
+              : `Correct. Now play ${currentNotes[index + 1].note}.`);
+            if (index + 1 >= currentNotes.length) {
+              pitchDetectionService.stop();
+              setIsGuidedPractice(false);
+            }
+            return Math.min(index + 1, currentNotes.length);
+          }
+
+          setAttempts((previous) => {
+            const nextCount = (previous[index] ?? 0) + 1;
+            if (nextCount >= 2) {
+              setPracticeTempo((tempo) => Math.max(45, Math.round(tempo * 0.85)));
+              setFeedback(`Let’s isolate this note. You played ${detectedNote}; aim for ${expected.note}. The practice tempo is now slower.`);
+              void audioService.initialize().then(() => audioService.playNote(expected.note, '4n'));
+            } else {
+              setFeedback(`Close — you played ${detectedNote}. Try ${expected.note} again.`);
+            }
+            return { ...previous, [index]: nextCount };
+          });
+          return index;
+        });
+      });
+      setIsGuidedPractice(true);
+    } catch {
+      setFeedback('Microphone access is required for guided practice. You can still use Listen mode.');
+      setIsGuidedPractice(false);
+    }
+  };
+
+  const finishLesson = () => {
+    const hardestNotes = Object.entries(attempts)
+      .filter(([, count]) => count >= 2)
+      .map(([index]) => currentNotes[Number(index)]?.note)
+      .filter((note): note is string => Boolean(note));
+    onComplete({
+      durationSeconds: Math.max(30, Math.round((Date.now() - startedAtRef.current) / 1000)),
+      notesPlayed: correctNotes + Object.values(attempts).reduce((sum, value) => sum + value, 0),
+      correctNotes,
+      hardestNotes,
+    });
   };
 
   return (
@@ -82,6 +178,9 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
                 {lesson.difficulty}
               </span>
               <span className="text-gray-500 text-sm">{lesson.tempo} BPM</span>
+              {practiceTempo < lesson.tempo && (
+                <span className="text-amber-700 text-sm font-semibold">Adaptive tempo: {practiceTempo} BPM</span>
+              )}
               <span className="text-gray-500 text-sm">{lesson.category}</span>
             </div>
             <p className="text-gray-700">{lesson.synopsis || lesson.practiceTip || 'Learn this beautiful violin piece!'}</p>
@@ -130,6 +229,18 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
             </div>
           </div>
 
+          <div className="mb-6 rounded-xl border border-purple-200 bg-purple-50 p-4" aria-live="polite">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold text-purple-950">Guided feedback</p>
+                <p className="text-sm text-purple-800">{feedback}</p>
+              </div>
+              <div className="text-sm font-semibold text-purple-900">
+                {Math.min(currentNoteIndex, currentNotes.length)} / {currentNotes.length} notes
+              </div>
+            </div>
+          </div>
+
           {/* Playback Controls */}
           <div className="flex items-center justify-center gap-4 mb-6">
             <button
@@ -137,21 +248,29 @@ export default function LessonPlayer({ lesson, onExit, onComplete }: LessonPlaye
               disabled={isPlaying}
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isPlaying ? '▶️ Playing...' : '▶️ Play'}
+              {isPlaying ? 'Playing…' : 'Listen'}
             </button>
             <button
               onClick={handleStop}
               className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition-colors"
             >
-              ⏹️ Stop
+              Stop
+            </button>
+            <button
+              onClick={() => void startGuidedPractice()}
+              disabled={isPlaying}
+              className="px-6 py-3 bg-purple-900 text-white rounded-xl font-bold hover:bg-purple-800 transition-colors disabled:opacity-50"
+            >
+              {isGuidedPractice ? 'Pause practice' : 'Start guided practice'}
             </button>
           </div>
 
           <button
-            onClick={onComplete}
+            onClick={finishLesson}
+            disabled={correctNotes < currentNotes.length}
             className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg transition-all"
           >
-            ✓ Complete Lesson
+            {correctNotes >= currentNotes.length ? 'Complete lesson' : 'Complete guided practice to finish'}
           </button>
         </div>
       </div>

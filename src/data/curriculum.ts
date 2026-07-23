@@ -9,136 +9,66 @@ export interface Level {
   badge: string;
 }
 
+/**
+ * Every curriculum item maps to a lesson that is currently shipped.
+ * Add future levels only after their learning activities exist.
+ */
 export const curriculum: Level[] = [
   {
     id: 'level-1',
-    name: 'Getting Started',
-    description: 'Learn the basics of violin playing - holding the instrument, bow hold, and open strings',
+    name: 'Open strings & first melodies',
+    description: 'Build a relaxed setup, recognize the four strings, and play short familiar melodies.',
     difficulty: 'beginner',
-    lessons: ['open-strings', 'bow-hold', 'violin-posture'],
+    lessons: ['open-strings', 'twinkle-twinkle', 'mary-had-little-lamb'],
     prerequisites: [],
     xpReward: 100,
     badge: '🎻',
   },
   {
     id: 'level-2',
-    name: 'First Position',
-    description: 'Master the fundamental notes and finger positions in first position',
+    name: 'First-position foundations',
+    description: 'Use first-position finger patterns in G, D, and A major.',
     difficulty: 'beginner',
-    lessons: ['finger-placement', 'g-major-scale', 'd-major-scale'],
+    lessons: ['scales-g-major', 'scales-d-major', 'scales-a-major'],
     prerequisites: ['level-1'],
     xpReward: 150,
     badge: '🎵',
   },
   {
     id: 'level-3',
-    name: 'Simple Songs',
-    description: 'Play your first complete songs using open strings and first finger',
+    name: 'Rhythm & string crossing',
+    description: 'Apply steady pulse and clean string changes in complete melodies.',
     difficulty: 'beginner',
-    lessons: ['twinkle-twinkle', 'mary-had-little-lamb', 'happy-birthday'],
+    lessons: ['ode-to-joy', 'row-row-row-your-boat', 'frere-jacques'],
     prerequisites: ['level-2'],
     xpReward: 200,
     badge: '🎶',
   },
   {
     id: 'level-4',
-    name: 'Bowing Basics',
-    description: 'Learn fundamental bowing techniques - détaché, legato, and string crossing',
+    name: 'Musical phrasing',
+    description: 'Develop longer phrases, smoother bow distribution, and confident performance.',
     difficulty: 'intermediate',
-    lessons: ['detache', 'legato', 'string-crossing'],
+    lessons: ['amazing-grace', 'canon-in-d', 'jingle-bells'],
     prerequisites: ['level-3'],
     xpReward: 300,
-    badge: '🎼',
-  },
-  {
-    id: 'level-5',
-    name: 'Scale Mastery',
-    description: 'Master major and minor scales in first position',
-    difficulty: 'intermediate',
-    lessons: ['a-major-scale', 'e-minor-scale', 'd-major-2oct'],
-    prerequisites: ['level-4'],
-    xpReward: 350,
-    badge: '🎹',
-  },
-  {
-    id: 'level-6',
-    name: 'Intermediate Songs',
-    description: 'Play more complex melodies with multiple strings and finger patterns',
-    difficulty: 'intermediate',
-    lessons: ['ode-to-joy', 'canon-in-d', 'amazing-grace'],
-    prerequisites: ['level-5'],
-    xpReward: 400,
-    badge: '🎵',
-  },
-  {
-    id: 'level-7',
-    name: 'Rhythm & Timing',
-    description: 'Develop strong rhythmic skills and timing accuracy',
-    difficulty: 'intermediate',
-    lessons: ['rhythm-exercises', 'metronome-practice', 'syncopation'],
-    prerequisites: ['level-6'],
-    xpReward: 500,
-    badge: '🎼',
-  },
-  {
-    id: 'level-8',
-    name: 'Advanced Techniques',
-    description: 'Master advanced playing techniques including vibrato and shifting',
-    difficulty: 'advanced',
-    lessons: ['vibrato-intro', 'shifting-basics', 'third-position'],
-    prerequisites: ['level-7'],
-    xpReward: 600,
-    badge: '🎶',
-  },
-  {
-    id: 'level-9',
-    name: 'Master Pieces',
-    description: 'Play classical and popular masterpieces with expression',
-    difficulty: 'advanced',
-    lessons: ['fur-elise', 'meditation-thais', 'bach-solo'],
-    prerequisites: ['level-8'],
-    xpReward: 750,
     badge: '🏆',
-  },
-  {
-    id: 'level-10',
-    name: 'Virtuoso',
-    description: 'Achieve mastery of the violin with advanced repertoire and techniques',
-    difficulty: 'advanced',
-    lessons: ['paginini-caprices', 'bach-sonatas', 'concerto-excerpts'],
-    prerequisites: ['level-9'],
-    xpReward: 1000,
-    badge: '👑',
   },
 ];
 
-export interface UserProgress {
-  currentLevel: string;
-  completedLessons: string[];
-  completedLevels: string[];
-  totalXP: number;
-  badges: string[];
-}
+export const getLevelById = (id: string): Level | undefined =>
+  curriculum.find((level) => level.id === id);
 
-export const getLevelById = (id: string): Level | undefined => {
-  return curriculum.find((level) => level.id === id);
-};
-
-export const getNextLevel = (currentLevelId: string): Level | undefined => {
-  const currentIndex = curriculum.findIndex((level) => level.id === currentLevelId);
-  if (currentIndex === -1 || currentIndex === curriculum.length - 1) return undefined;
-  return curriculum[currentIndex + 1];
-};
+export const isLevelComplete = (level: Level, completedLessons: string[]): boolean =>
+  level.lessons.every((lesson) => completedLessons.includes(lesson));
 
 export const isLevelUnlocked = (levelId: string, completedLevels: string[]): boolean => {
   const level = getLevelById(levelId);
-  if (!level) return false;
-  return level.prerequisites.every((prereq) => completedLevels.includes(prereq));
+  return Boolean(level?.prerequisites.every((prerequisite) => completedLevels.includes(prerequisite)));
 };
 
 export const calculateLevelProgress = (levelId: string, completedLessons: string[]): number => {
   const level = getLevelById(levelId);
-  if (!level) return 0;
-  const completedInLevel = level.lessons.filter((lesson) => completedLessons.includes(lesson)).length;
-  return (completedInLevel / level.lessons.length) * 100;
+  if (!level?.lessons.length) return 0;
+  return (level.lessons.filter((lesson) => completedLessons.includes(lesson)).length / level.lessons.length) * 100;
 };

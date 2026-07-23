@@ -4,8 +4,26 @@ export interface PublicDomainScore {
   composer: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   category: string;
-  url: string;
+  musicXml: string;
+  provenance: string;
 }
+
+const toMusicXml = (title: string, composer: string, notes: string[]) => {
+  const noteXml = notes.map((value) => {
+    const match = value.match(/^([A-G])([#b]?)(\d)$/);
+    if (!match) return '';
+    const [, step, accidental, octave] = match;
+    const alter = accidental === '#' ? '<alter>1</alter>' : accidental === 'b' ? '<alter>-1</alter>' : '';
+    return `<note><pitch><step>${step}</step>${alter}<octave>${octave}</octave></pitch><duration>1</duration><type>quarter</type></note>`;
+  }).join('');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <work><work-title>${title}</work-title></work>
+  <identification><creator type="composer">${composer}</creator><rights>Public domain</rights></identification>
+  <part-list><score-part id="P1"><part-name>Violin</part-name></score-part></part-list>
+  <part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>${noteXml}</measure></part>
+</score-partwise>`;
+};
 
 export const CATALOG: PublicDomainScore[] = [
   {
@@ -14,7 +32,8 @@ export const CATALOG: PublicDomainScore[] = [
     composer: 'Traditional',
     difficulty: 'Beginner',
     category: 'Folk',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
+    musicXml: toMusicXml('Twinkle Twinkle Little Star', 'Traditional', ['A4','A4','E5','E5','F#5','F#5','E5']),
+    provenance: 'Traditional melody; public domain.',
   },
   {
     id: 'ode-to-joy',
@@ -22,94 +41,39 @@ export const CATALOG: PublicDomainScore[] = [
     composer: 'Ludwig van Beethoven',
     difficulty: 'Beginner',
     category: 'Classical',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml' // Placeholder valid XML
+    musicXml: toMusicXml('Ode to Joy', 'Ludwig van Beethoven', ['F#4','F#4','G4','A4','A4','G4','F#4','E4']),
+    provenance: 'Beethoven, Symphony No. 9; public domain.',
   },
   {
     id: 'bach-minuet',
     title: 'Minuet in G',
-    composer: 'J.S. Bach',
+    composer: 'Christian Petzold',
     difficulty: 'Intermediate',
     category: 'Baroque',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
+    musicXml: toMusicXml('Minuet in G', 'Christian Petzold', ['D5','G4','A4','B4','C5','D5','G4','G4']),
+    provenance: 'BWV Anh. 114, attributed to Christian Petzold; public domain.',
   },
   {
     id: 'vivaldi-spring',
-    title: 'Spring (The Four Seasons)',
+    title: 'Spring theme',
     composer: 'Antonio Vivaldi',
     difficulty: 'Intermediate',
     category: 'Baroque',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
+    musicXml: toMusicXml('Spring theme', 'Antonio Vivaldi', ['E5','G#5','G#5','G#5','F#5','E5','B5']),
+    provenance: 'Vivaldi, The Four Seasons; public domain excerpt.',
   },
-  {
-    id: 'mozart-kleine',
-    title: 'Eine kleine Nachtmusik',
-    composer: 'W.A. Mozart',
-    difficulty: 'Intermediate',
-    category: 'Classical',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  },
-  {
-    id: 'paganini-caprice',
-    title: 'Caprice No. 24',
-    composer: 'Niccolò Paganini',
-    difficulty: 'Advanced',
-    category: 'Romantic',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  },
-  {
-    id: 'canon-in-d',
-    title: 'Canon in D',
-    composer: 'Johann Pachelbel',
-    difficulty: 'Beginner',
-    category: 'Baroque',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  },
-  {
-    id: 'swan-lake',
-    title: 'Swan Lake Theme',
-    composer: 'Pyotr Ilyich Tchaikovsky',
-    difficulty: 'Intermediate',
-    category: 'Romantic',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  },
-  {
-    id: 'meditation',
-    title: 'Méditation (Thaïs)',
-    composer: 'Jules Massenet',
-    difficulty: 'Advanced',
-    category: 'Romantic',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  },
-  {
-    id: 'schindler',
-    title: 'Theme from Schindler\'s List',
-    composer: 'John Williams',
-    difficulty: 'Intermediate',
-    category: 'Contemporary',
-    url: 'https://raw.githubusercontent.com/w3c/musicxml/gh-pages/docs/tutorial/bravura.xml'
-  }
 ];
 
 class PublicDomainAPI {
   async searchScores(query: string, difficulty?: string): Promise<PublicDomainScore[]> {
-    // Simulate network delay for a real API feel
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    let results = CATALOG;
-
-    if (query) {
-      const q = query.toLowerCase();
-      results = results.filter(score => 
-        score.title.toLowerCase().includes(q) || 
-        score.composer.toLowerCase().includes(q)
-      );
-    }
-
-    if (difficulty && difficulty !== 'All') {
-      results = results.filter(score => score.difficulty === difficulty);
-    }
-
-    return results;
+    const normalized = query.trim().toLowerCase();
+    return CATALOG.filter((score) => {
+      const matchesQuery = !normalized
+        || score.title.toLowerCase().includes(normalized)
+        || score.composer.toLowerCase().includes(normalized);
+      const matchesDifficulty = !difficulty || difficulty === 'All' || score.difficulty === difficulty;
+      return matchesQuery && matchesDifficulty;
+    });
   }
 }
 

@@ -1,6 +1,7 @@
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
 import { useNavigate } from 'react-router-dom';
+import PracticeSessionSummary from '../components/PracticeSessionSummary';
 
 export default function StatisticsPage() {
   const statistics = useAppStore((state) => state.statistics);
@@ -43,7 +44,7 @@ export default function StatisticsPage() {
           </div>
 
           <div className="bg-white rounded-3xl shadow-lg p-6 text-center">
-            <div className="text-4xl mb-2">�</div>
+            <div className="text-4xl mb-2">🎯</div>
             <div className="text-3xl font-bold text-purple-600">{statistics.notesPlayed.toLocaleString()}</div>
             <div className="text-sm text-gray-500">Notes Played</div>
           </div>
@@ -54,6 +55,8 @@ export default function StatisticsPage() {
             <div className="text-sm text-gray-500">Lessons Done</div>
           </div>
         </div>
+
+        <PracticeSessionSummary />
 
         {/* Achievement */}
         <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">

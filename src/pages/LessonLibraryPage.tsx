@@ -40,13 +40,8 @@ export default function LessonLibraryPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white overflow-x-hidden">
       {/* Hero Section */}
-      <div className="relative h-[60vh] w-full flex items-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1558556133-7227d81a3014?auto=format&fit=crop&w=2000&q=80')` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent" />
+      <div className="relative min-h-[440px] w-full flex items-center overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_rgba(168,85,247,0.35),_transparent_32%),radial-gradient(circle_at_65%_80%,_rgba(20,184,166,0.18),_transparent_30%),linear-gradient(120deg,#020617,#171126)]" />
         
         <div className="relative z-10 px-8 md:px-16 max-w-4xl">
           <motion.div
@@ -72,7 +67,7 @@ export default function LessonLibraryPage() {
                 <Play size={20} className="fill-current" /> Play Now
               </button>
               <button 
-                onClick={() => navigate('/import')}
+                onClick={() => navigate('/song-upload')}
                 className="flex items-center gap-2 bg-gray-500/30 backdrop-blur-md border border-gray-500/50 text-white px-8 py-3 rounded-full font-bold hover:bg-gray-500/50 transition-colors"
               >
                 <Upload size={20} /> Import MusicXML

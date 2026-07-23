@@ -1,10 +1,9 @@
+import SkillTrainer from '../components/SkillTrainer';
+
 export default function NoteNamingPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Note Naming</h1>
-        <p className="text-lg text-gray-700">Learn to read and name musical notes.</p>
-      </div>
-    </div>
-  );
+  return <SkillTrainer title="Name notes on the violin" description="Connect strings, fingers and written pitch." skill="Note reading" items={[
+    { prompt: 'What note is first finger on the A string in the usual beginner pattern?', options: ['A', 'B', 'C', 'D'], correct: 'B', explanation: 'A plus a whole step gives B.' },
+    { prompt: 'What note is third finger on the D string?', options: ['E', 'F♯', 'G', 'A'], correct: 'G', explanation: 'In first position, third finger on D is G.' },
+    { prompt: 'Which written note matches the open highest string?', options: ['G3', 'D4', 'A4', 'E5'], correct: 'E5', explanation: 'The E string is the violin’s highest open string.' },
+  ]} />;
 }

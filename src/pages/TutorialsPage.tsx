@@ -4,7 +4,6 @@ import { violinTutorials, getTutorialsByCategory, type Tutorial } from '../data/
 export default function TutorialsPage() {
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const categories = ['all', 'basics', 'technique', 'music-theory', 'practice', 'advanced'];
 
@@ -56,41 +55,6 @@ export default function TutorialsPage() {
 
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{selectedTutorial.title}</h1>
             <p className="text-lg text-gray-700 mb-8">{selectedTutorial.description}</p>
-
-            {/* Audio/Video Player */}
-            <div className="mb-8 bg-gray-100 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">🎵 Audio Guide</h3>
-                <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  {isPlaying ? '⏸️ Pause' : '▶️ Play'}
-                </button>
-              </div>
-              <div className="bg-white rounded-lg p-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    {isPlaying ? '🎵' : '🎧'}
-                  </div>
-                  <div className="flex-1">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-purple-600 transition-all"
-                        style={{ width: isPlaying ? '45%' : '0%' }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-sm text-gray-500 mt-1">
-                      <span>{isPlaying ? '1:23' : '0:00'}</span>
-                      <span>3:00</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mt-3">
-                Listen to the audio guide while following the tutorial. The audio provides step-by-step instructions and demonstrations.
-              </p>
-            </div>
 
             <div className="space-y-8">
               {selectedTutorial.sections.map((section, index) => (
@@ -183,8 +147,8 @@ export default function TutorialsPage() {
                 <span>📚 {tutorial.sections.length} sections</span>
               </div>
               
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <span className="text-xs text-purple-600 font-medium">🎵 Includes audio guide</span>
+              <div className="mt-3 border-t border-gray-100 pt-3 text-xs font-medium text-purple-700">
+                Guided reading · practical exercises
               </div>
             </div>
           ))}

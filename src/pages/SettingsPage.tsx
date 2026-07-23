@@ -1,8 +1,13 @@
 import { useAppStore } from '../store/useAppStore';
+import GoogleSignIn from '../components/GoogleSignIn';
+import { useUserProfileStore } from '../store/useUserProfileStore';
 
 export default function SettingsPage() {
   const settings = useAppStore((state) => state.settings);
   const updateSettings = useAppStore((state) => state.updateSettings);
+  const signInWithGoogle = useUserProfileStore((state) => state.signInWithGoogle);
+  const isAuthenticated = useUserProfileStore((state) => state.isAuthenticated);
+  const googleUser = useUserProfileStore((state) => state.googleUser);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
@@ -22,6 +27,10 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-600">Display note names on the fingerboard</p>
                 </div>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.showFingerboardLabels}
+                  aria-label="Show fingerboard labels"
                   onClick={() => updateSettings({ showFingerboardLabels: !settings.showFingerboardLabels })}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     settings.showFingerboardLabels ? 'bg-purple-600' : 'bg-gray-300'
@@ -39,6 +48,10 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-600">Display note names on strings</p>
                 </div>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.showNoteNames}
+                  aria-label="Show note names"
                   onClick={() => updateSettings({ showNoteNames: !settings.showNoteNames })}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     settings.showNoteNames ? 'bg-purple-600' : 'bg-gray-300'
@@ -56,6 +69,10 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-600">Use dark theme</p>
                 </div>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.darkMode}
+                  aria-label="Use dark mode"
                   onClick={() => updateSettings({ darkMode: !settings.darkMode })}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     settings.darkMode ? 'bg-purple-600' : 'bg-gray-300'
@@ -75,17 +92,18 @@ export default function SettingsPage() {
             
             <div className="space-y-4">
               <div>
-                <p className="font-medium text-gray-900 mb-2">Volume</p>
+                <label htmlFor="audio-volume" className="font-medium text-gray-900 mb-2 block">Volume</label>
                 <input
+                  id="audio-volume"
                   type="range"
                   min="0"
-                  max="1"
-                  step="0.1"
+                  max="100"
+                  step="5"
                   value={settings.audioVolume}
                   onChange={(e) => updateSettings({ audioVolume: parseFloat(e.target.value) })}
                   className="w-full"
                 />
-                <p className="text-sm text-gray-600 mt-1">{Math.round(settings.audioVolume * 100)}%</p>
+                <p className="text-sm text-gray-600 mt-1">{Math.round(settings.audioVolume)}%</p>
               </div>
 
               <div className="flex items-center justify-between">
@@ -94,6 +112,10 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-600">Display sharps instead of flats</p>
                 </div>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.useSharps}
+                  aria-label="Use sharps instead of flats"
                   onClick={() => updateSettings({ useSharps: !settings.useSharps })}
                   className={`w-12 h-6 rounded-full transition-colors ${
                     settings.useSharps ? 'bg-purple-600' : 'bg-gray-300'
@@ -113,8 +135,9 @@ export default function SettingsPage() {
             
             <div className="space-y-4">
               <div>
-                <p className="font-medium text-gray-900 mb-2">Animation Speed</p>
+                <label htmlFor="animation-speed" className="font-medium text-gray-900 mb-2 block">Animation Speed</label>
                 <input
+                  id="animation-speed"
                   type="range"
                   min="0.5"
                   max="2"
@@ -126,6 +149,37 @@ export default function SettingsPage() {
                 <p className="text-sm text-gray-600 mt-1">{settings.animationSpeed}x</p>
               </div>
             </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Language</h2>
+            <label htmlFor="app-language" className="block text-sm font-medium text-gray-700 mb-2">
+              Interface language
+            </label>
+            <select
+              id="app-language"
+              value={settings.language ?? 'en'}
+              onChange={(event) => updateSettings({ language: event.target.value })}
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3"
+            >
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="de">Deutsch</option>
+              <option value="ja">日本語</option>
+              <option value="zh">中文</option>
+            </select>
+            <p className="mt-2 text-sm text-gray-600">Core navigation and new learning experiences will follow this preference as translations are completed.</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Cloud backup</h2>
+            {isAuthenticated && googleUser ? (
+              <p className="rounded-xl bg-green-50 p-4 text-green-900">
+                Signed in as <strong>{googleUser.email || googleUser.name}</strong>. Profile changes sync automatically.
+              </p>
+            ) : (
+              <GoogleSignIn onSignIn={signInWithGoogle} />
+            )}
           </div>
 
           {/* Finger Colors */}

@@ -1,157 +1,85 @@
 import { useState } from 'react';
-import { PersonalizationData } from '../types/userProfile';
+import type { AgeGroup, LearningGoal, PersonalizationData, PracticeFrequency, SkillLevel } from '../types/userProfile';
 
 interface OnboardingPageProps {
   onComplete: (data: PersonalizationData) => void;
 }
 
-const onboardingSteps = [
-  {
-    title: "Welcome to Violin Mentor! 🎻",
-    content: "We'll help you learn violin step by step, even if you've never played before.",
-    emoji: "🎻",
-  },
-  {
-    title: "Have you played violin before?",
-    content: "This helps us customize your learning experience.",
-    emoji: "🤔",
-    hasChoice: true,
-  },
-  {
-    title: "Here's how it works",
-    content: "Learn → Practice → Play. We'll guide you through each step with easy lessons.",
-    emoji: "📚",
-  },
-  {
-    title: "Your first lesson",
-    content: "We'll start with the basics: how to hold your violin and make your first sound.",
-    emoji: "🎯",
-  },
-  {
-    title: "You're ready to start!",
-    content: "Let's begin your violin journey. Your first lesson is waiting!",
-    emoji: "🚀",
-  },
-];
+const ageOptions: Array<[AgeGroup, string]> = [['5-8', '5–8'], ['9-12', '9–12'], ['13-17', '13–17'], ['18+', '18+']];
+const skillOptions: Array<[SkillLevel, string]> = [['beginner', 'New to violin'], ['intermediate', 'Some experience'], ['advanced', 'Advanced']];
+const goalOptions: Array<[LearningGoal, string]> = [['fun', 'Play for enjoyment'], ['classical', 'Classical repertoire'], ['folk', 'Folk music'], ['jazz', 'Jazz'], ['exams', 'Prepare for exams'], ['professional', 'Professional growth']];
+const frequencyOptions: Array<[PracticeFrequency, string]> = [['daily', 'Daily'], ['few-times-week', 'A few times a week'], ['weekly', 'Weekly'], ['occasional', 'Occasionally']];
+const genreOptions = ['Classical', 'Folk', 'Film music', 'Jazz', 'Sacred', 'Children’s songs'];
+
+function ChoiceGroup<T extends string>({ legend, options, value, onChange }: {
+  legend: string;
+  options: Array<[T, string]>;
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-3 text-lg font-bold text-slate-950">{legend}</legend>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {options.map(([option, label]) => (
+          <label key={option} className={`flex min-h-12 cursor-pointer items-center rounded-xl border px-4 py-3 ${value === option ? 'border-purple-600 bg-purple-50 text-purple-950' : 'border-slate-200 bg-white text-slate-700'}`}>
+            <input className="mr-3 accent-purple-700" type="radio" name={legend} value={option} checked={value === option} onChange={() => onChange(option)} />
+            {label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
 export default function OnboardingPage({ onComplete }: OnboardingPageProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [skillLevel, setSkillLevel] = useState<'beginner' | 'intermediate' | 'advanced' | null>(null);
-
-  const handleNext = () => {
-    if (currentStep < onboardingSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      completeOnboarding();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleChoice = (choice: 'beginner' | 'intermediate' | 'advanced') => {
-    setSkillLevel(choice);
-    handleNext();
-  };
-
-  const completeOnboarding = () => {
-    const data: PersonalizationData = {
-      ageGroup: '9-12',
-      skillLevel: skillLevel || 'beginner',
-      learningGoal: 'fun',
-      practiceFrequency: 'few-times-week',
-      favoriteGenres: [],
-    };
-    onComplete(data);
-  };
-
-  const step = onboardingSteps[currentStep];
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>('9-12');
+  const [skillLevel, setSkillLevel] = useState<SkillLevel>('beginner');
+  const [learningGoal, setLearningGoal] = useState<LearningGoal>('fun');
+  const [practiceFrequency, setPracticeFrequency] = useState<PracticeFrequency>('few-times-week');
+  const [favoriteGenres, setFavoriteGenres] = useState<string[]>([]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 flex items-center justify-center">
-      <div className="max-w-2xl mx-auto w-full">
-        {/* Progress indicator */}
-        <div className="flex justify-center gap-2 mb-8">
-          {onboardingSteps.map((_, index) => (
-            <div
-              key={index}
-              className={`h-2 rounded-full transition-all ${
-                index === currentStep ? 'w-8 bg-purple-600' : 
-                index < currentStep ? 'w-2 bg-purple-400' : 'w-2 bg-gray-300'
-              }`}
-            />
-          ))}
+    <main className="min-h-screen bg-[#fffdf8] px-4 py-10">
+      <form
+        className="mx-auto max-w-3xl rounded-3xl border border-purple-100 bg-white p-6 shadow-xl sm:p-9"
+        onSubmit={(event) => {
+          event.preventDefault();
+          onComplete({ ageGroup, skillLevel, learningGoal, practiceFrequency, favoriteGenres });
+        }}
+      >
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Set up your plan</p>
+        <h1 className="mt-2 text-4xl font-bold text-slate-950">Tell us how you want to learn</h1>
+        <p className="mt-3 text-slate-600">These choices set recommended content and practice targets. You can change them later.</p>
+
+        <div className="mt-8 space-y-8">
+          <ChoiceGroup legend="Age group" options={ageOptions} value={ageGroup} onChange={setAgeGroup} />
+          <ChoiceGroup legend="Current experience" options={skillOptions} value={skillLevel} onChange={setSkillLevel} />
+          <ChoiceGroup legend="Main learning goal" options={goalOptions} value={learningGoal} onChange={setLearningGoal} />
+          <ChoiceGroup legend="Realistic practice schedule" options={frequencyOptions} value={practiceFrequency} onChange={setPracticeFrequency} />
+
+          <fieldset>
+            <legend className="mb-3 text-lg font-bold text-slate-950">Music you enjoy <span className="font-normal text-slate-500">(optional)</span></legend>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {genreOptions.map((genre) => (
+                <label key={genre} className={`flex min-h-12 cursor-pointer items-center rounded-xl border px-4 py-3 ${favoriteGenres.includes(genre) ? 'border-purple-600 bg-purple-50' : 'border-slate-200'}`}>
+                  <input
+                    type="checkbox"
+                    className="mr-3 accent-purple-700"
+                    checked={favoriteGenres.includes(genre)}
+                    onChange={() => setFavoriteGenres((current) => current.includes(genre) ? current.filter((item) => item !== genre) : [...current, genre])}
+                  />
+                  {genre}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
 
-        {/* Main content card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
-          {/* Emoji */}
-          <div className="text-8xl mb-6 animate-bounce">{step.emoji}</div>
-          
-          {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{step.title}</h1>
-          
-          {/* Content */}
-          <p className="text-xl text-gray-700 mb-8">{step.content}</p>
-
-          {/* Choice buttons for step 2 */}
-          {step.hasChoice && skillLevel === null && (
-            <div className="space-y-4 mb-8">
-              <button
-                onClick={() => handleChoice('beginner')}
-                className="w-full py-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
-              >
-                <span>🐣</span> Beginner (Brand New)
-              </button>
-              <button
-                onClick={() => handleChoice('intermediate')}
-                className="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
-              >
-                <span>🎻</span> Intermediate (Some Experience)
-              </button>
-              <button
-                onClick={() => handleChoice('advanced')}
-                className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
-              >
-                <span>🔥</span> Advanced / Expert
-              </button>
-            </div>
-          )}
-
-          {/* Navigation buttons */}
-          {!step.hasChoice && (
-            <div className="flex gap-4">
-              {currentStep > 0 && (
-                <button
-                  onClick={handleBack}
-                  className="flex-1 py-4 bg-gray-200 text-gray-700 rounded-xl font-bold text-lg hover:bg-gray-300 transition-colors"
-                >
-                  Back
-                </button>
-              )}
-              <button
-                onClick={handleNext}
-                className="flex-1 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all hover:scale-105"
-              >
-                {currentStep === onboardingSteps.length - 1 ? 'Start Learning' : 'Next'}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Skip button */}
-        {currentStep < onboardingSteps.length - 1 && (
-          <button
-            onClick={completeOnboarding}
-            className="mt-6 text-gray-500 hover:text-gray-700 text-lg"
-          >
-            Skip for now
-          </button>
-        )}
-      </div>
-    </div>
+        <button type="submit" className="mt-9 min-h-12 w-full rounded-xl bg-purple-700 px-5 py-3 text-lg font-bold text-white hover:bg-purple-800">
+          Build my learning plan
+        </button>
+      </form>
+    </main>
   );
 }

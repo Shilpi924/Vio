@@ -1,51 +1,53 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
+import i18n from './i18n';
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import Achievements from './components/Achievements';
 import AIChatBot from './components/AIChatBot';
-import AudioComparison from './components/AudioComparison';
-import InteractiveFingerboard from './components/InteractiveFingerboard';
-import LessonPlayer from './components/LessonPlayer';
-import Metronome from './components/Metronome';
 import NavigationBar from './components/NavigationBar';
-import NoteMatchingGame from './components/NoteMatchingGame';
-import ParentDashboard from './components/ParentDashboard';
-import PracticeReminders from './components/PracticeReminders';
-import PracticeTimer from './components/PracticeTimer';
-import SlowPlayback from './components/SlowPlayback';
-import VideoTutorial from './components/VideoTutorial';
-import ViolinTuner from './components/ViolinTuner';
-import WeeklyChallenges from './components/WeeklyChallenges';
 import { sampleLessons } from './data/lessons';
 import { completeLesson } from './features/lessons/application/completeLesson';
 import { useCloudSync } from './hooks/useCloudSync';
-import BeginnerPath from './pages/BeginnerPath';
-import ChordTrainerPage from './pages/ChordTrainerPage';
-import CurriculumPage from './pages/CurriculumPage';
-import EarTrainingPage from './pages/EarTrainingPage';
-import FreePlayPage from './pages/FreePlayPage';
-import HandPositioningPage from './pages/HandPositioningPage';
 import HomePage from './pages/HomePage';
-import IntervalTrainingPage from './pages/IntervalTrainingPage';
-import LessonCreatorPage from './pages/LessonCreatorPage';
-import LessonLibraryPage from './pages/LessonLibraryPage';
-import NoteNamingPage from './pages/NoteNamingPage';
-import OnboardingPage from './pages/OnboardingPage';
-import PerformanceModePage from './pages/PerformanceModePage';
-import RhythmTrainingPage from './pages/RhythmTrainingPage';
-import ScalesTrainerPage from './pages/ScalesTrainerPage';
-import SettingsPage from './pages/SettingsPage';
-import SightReadingPage from './pages/SightReadingPage';
-import SongUploadPage from './pages/SongUploadPage';
-import StatisticsPage from './pages/StatisticsPage';
-import TutorialsPage from './pages/TutorialsPage';
-import { audioService } from './services/audioService';
 import { useAppStore } from './store/useAppStore';
 import { useUserProfileStore } from './store/useUserProfileStore';
+
+const Achievements = lazy(() => import('./components/Achievements'));
+const AudioComparison = lazy(() => import('./components/AudioComparison'));
+const InteractiveFingerboard = lazy(() => import('./components/InteractiveFingerboard'));
+const LessonPlayer = lazy(() => import('./components/LessonPlayer'));
+const Metronome = lazy(() => import('./components/Metronome'));
+const NoteMatchingGame = lazy(() => import('./components/NoteMatchingGame'));
+const ParentDashboard = lazy(() => import('./components/ParentDashboard'));
+const PracticeReminders = lazy(() => import('./components/PracticeReminders'));
+const PracticeTimer = lazy(() => import('./components/PracticeTimer'));
+const SlowPlayback = lazy(() => import('./components/SlowPlayback'));
+const VideoTutorial = lazy(() => import('./components/VideoTutorial'));
+const ViolinTuner = lazy(() => import('./components/ViolinTuner'));
+const WeeklyChallenges = lazy(() => import('./components/WeeklyChallenges'));
+const BeginnerPath = lazy(() => import('./pages/BeginnerPath'));
+const ChordTrainerPage = lazy(() => import('./pages/ChordTrainerPage'));
+const CurriculumPage = lazy(() => import('./pages/CurriculumPage'));
+const EarTrainingPage = lazy(() => import('./pages/EarTrainingPage'));
+const FreePlayPage = lazy(() => import('./pages/FreePlayPage'));
+const HandPositioningPage = lazy(() => import('./pages/HandPositioningPage'));
+const IntervalTrainingPage = lazy(() => import('./pages/IntervalTrainingPage'));
+const LessonCreatorPage = lazy(() => import('./pages/LessonCreatorPage'));
+const LessonLibraryPage = lazy(() => import('./pages/LessonLibraryPage'));
+const NoteNamingPage = lazy(() => import('./pages/NoteNamingPage'));
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
+const PerformanceModePage = lazy(() => import('./pages/PerformanceModePage'));
+const RhythmTrainingPage = lazy(() => import('./pages/RhythmTrainingPage'));
+const ScalesTrainerPage = lazy(() => import('./pages/ScalesTrainerPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const SightReadingPage = lazy(() => import('./pages/SightReadingPage'));
+const SongUploadPage = lazy(() => import('./pages/SongUploadPage'));
+const StatisticsPage = lazy(() => import('./pages/StatisticsPage'));
+const TutorialsPage = lazy(() => import('./pages/TutorialsPage'));
 
 function LessonRoute() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
   const customLessons = useAppStore((state) => state.customLessons);
+  const activeProfileId = useUserProfileStore((state) => state.activeProfileId);
   const lesson = [...sampleLessons, ...customLessons].find((candidate) => candidate.id === lessonId);
 
   if (!lesson) {
@@ -58,8 +60,12 @@ function LessonRoute() {
         <LessonPlayer
           lesson={lesson}
           onExit={() => navigate(-1)}
-          onComplete={() => {
-            completeLesson(lesson.id);
+          onComplete={(result) => {
+            completeLesson(lesson.id, {
+              ...result,
+              profileId: activeProfileId,
+              title: lesson.title,
+            });
             navigate('/lessons', { replace: true });
           }}
         />
@@ -84,16 +90,30 @@ function OnboardingRoute() {
 
 function App() {
   const audioVolume = useAppStore((state) => state.settings.audioVolume);
+  const darkMode = useAppStore((state) => state.settings.darkMode);
+  const language = useAppStore((state) => state.settings.language ?? 'en');
   useCloudSync();
 
   useEffect(() => {
-    audioService.setVolume(audioVolume / 100);
+    void import('./services/audioService').then(({ audioService }) => {
+      audioService.setVolume(audioVolume / 100);
+    });
   }, [audioVolume]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
+
+  useEffect(() => {
+    void i18n.changeLanguage(language);
+    document.documentElement.lang = language;
+  }, [language]);
 
   return (
     <div className="min-h-screen">
       <NavigationBar />
-      <Routes>
+      <Suspense fallback={<div className="mx-auto max-w-5xl px-4 py-16 text-center text-slate-600" role="status">Loading practice space…</div>}>
+        <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/beginner-path" element={<BeginnerPath />} />
         <Route path="/fingerboard" element={<InteractiveFingerboard />} />
@@ -128,7 +148,8 @@ function App() {
         <Route path="/challenges" element={<WeeklyChallenges />} />
         <Route path="/reminders" element={<PracticeReminders />} />
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </Suspense>
       <AIChatBot />
     </div>
   );

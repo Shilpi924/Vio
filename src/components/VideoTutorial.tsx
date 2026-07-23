@@ -34,16 +34,6 @@ const tutorials: Tutorial[] = [
     attribution: 'Violin Lounge TV',
   },
   {
-    id: '3',
-    title: 'Your First Sound',
-    description: 'Play your first note on the violin with confidence',
-    duration: '10:00',
-    thumbnail: '🎵',
-    category: 'basics',
-    youtubeId: 'placeholder',
-    attribution: 'Find Creative Commons video',
-  },
-  {
     id: '4',
     title: 'Tuning Your Violin',
     description: 'Keep your violin sounding perfect with proper tuning',
@@ -52,26 +42,6 @@ const tutorials: Tutorial[] = [
     category: 'basics',
     youtubeId: 'Ga5e1uyRI7g',
     attribution: 'TakeLessons',
-  },
-  {
-    id: '5',
-    title: 'Reading Music Notes',
-    description: 'Learn to read sheet music notes for violin',
-    duration: '15:00',
-    thumbnail: '📝',
-    category: 'basics',
-    youtubeId: 'placeholder',
-    attribution: 'Find Creative Commons video',
-  },
-  {
-    id: '6',
-    title: 'Playing Twinkle Twinkle',
-    description: 'Learn your first song step by step',
-    duration: '12:00',
-    thumbnail: '⭐',
-    category: 'songs',
-    youtubeId: 'placeholder',
-    attribution: 'Find Creative Commons video',
   },
 ];
 

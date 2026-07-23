@@ -66,6 +66,21 @@ export interface Statistics {
   lastPracticeDate: Date;
 }
 
+export interface PracticeSession {
+  id: string;
+  profileId: string;
+  startedAt: string;
+  durationSeconds: number;
+  activity: 'lesson' | 'trainer' | 'free-play' | 'tuner' | 'imported-score';
+  title: string;
+  lessonId?: string;
+  notesPlayed: number;
+  correctNotes: number;
+  accuracy: number;
+  hardestNotes: string[];
+  completed: boolean;
+}
+
 export interface Settings {
   showFingerboardLabels: boolean;
   showNoteNames: boolean;

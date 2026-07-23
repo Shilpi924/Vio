@@ -6,6 +6,20 @@ const anthropicApiKey = defineSecret('ANTHROPIC_API_KEY');
 const MAX_MESSAGES = 20;
 const MAX_MESSAGE_LENGTH = 4_000;
 
+function normalizeLearnerContext(value) {
+  if (!value || typeof value !== 'object') return '';
+  const safe = {
+    skillLevel: String(value.skillLevel || '').slice(0, 40),
+    learningGoal: String(value.learningGoal || '').slice(0, 80),
+    completedLessons: Array.isArray(value.completedLessons) ? value.completedLessons.slice(-10).map(String) : [],
+    practiceMinutes: Number(value.practiceMinutes) || 0,
+    accuracy: Number(value.accuracy) || 0,
+    hardestNotes: Array.isArray(value.hardestNotes) ? value.hardestNotes.slice(0, 8).map(String) : [],
+    recentSessions: Array.isArray(value.recentSessions) ? value.recentSessions.slice(0, 5) : [],
+  };
+  return JSON.stringify(safe).slice(0, 2_000);
+}
+
 function normalizeMessages(value) {
   if (!Array.isArray(value)) return [];
 
@@ -41,6 +55,7 @@ exports.chat = onRequest(
     }
 
     const messages = normalizeMessages(request.body?.messages);
+    const learnerContext = normalizeLearnerContext(request.body?.learnerContext);
     if (!messages.length || messages[messages.length - 1].role !== 'user') {
       response.status(400).send({ error: 'A user message is required.' });
       return;
@@ -51,7 +66,7 @@ exports.chat = onRequest(
       const result = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
         max_tokens: 500,
-        system: 'You are Violin Mentor, a friendly and encouraging violin teacher for children and families. Give accurate, age-appropriate, concise guidance about violin technique, music theory, practice, and musical learning. Prioritize safety and recommend an in-person teacher for pain, injury, or technique that needs physical assessment.',
+        system: `You are Violin Mentor, a friendly and encouraging violin teacher for children and families. Give accurate, age-appropriate, concise guidance about violin technique, music theory, practice, and musical learning. Use the learner context only when it is relevant and never invent progress. Prioritize safety and recommend an in-person teacher for pain, injury, or technique that needs physical assessment.\nLearner context: ${learnerContext || 'No recorded practice context yet.'}`,
         messages,
       });
       const reply = result.content

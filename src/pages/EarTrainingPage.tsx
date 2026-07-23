@@ -1,10 +1,9 @@
+import SkillTrainer from '../components/SkillTrainer';
+
 export default function EarTrainingPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Ear Training</h1>
-        <p className="text-lg text-gray-700">Train your ear to recognize notes and intervals.</p>
-      </div>
-    </div>
-  );
+  return <SkillTrainer title="Open-string ear training" description="Listen before answering. Build a reliable connection between sound, string and note name." skill="Ear training" items={[
+    { prompt: 'Which open string did you hear?', options: ['G', 'D', 'A', 'E'], correct: 'G', explanation: 'G3 is the violin’s lowest open string.', audioNotes: ['G3'] },
+    { prompt: 'Which open string did you hear?', options: ['G', 'D', 'A', 'E'], correct: 'A', explanation: 'A4 is the standard tuning reference at 440 Hz.', audioNotes: ['A4'] },
+    { prompt: 'Did the second note move higher or lower?', options: ['Higher', 'Lower', 'Same pitch', 'Cannot tell'], correct: 'Higher', explanation: 'D4 to A4 rises by a perfect fifth.', audioNotes: ['D4','A4'] },
+  ]} />;
 }
