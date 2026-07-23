@@ -15,17 +15,27 @@ await mkdir(serverDir, { recursive: true });
 await writeFile(new URL('index.js', serverDir), `export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    let response = await env.ASSETS.fetch(request);
-    if (response.status === 404) {
-      const packagedAssetUrl = new URL(\`/static\${url.pathname}\`, request.url);
-      packagedAssetUrl.search = url.search;
-      response = await env.ASSETS.fetch(new Request(packagedAssetUrl, request));
+    const assetPrefixes = ['', '/static', '/dist/static'];
+    let response = new Response('Not found', { status: 404 });
+
+    for (const prefix of assetPrefixes) {
+      const assetUrl = new URL(prefix + url.pathname, request.url);
+      assetUrl.search = url.search;
+      response = await env.ASSETS.fetch(new Request(assetUrl, request));
+      if (response.status !== 404) return response;
     }
-    if (response.status !== 404 || request.method !== 'GET') return response;
+
+    if (request.method !== 'GET') return response;
     const acceptsHtml = request.headers.get('accept')?.includes('text/html');
     if (!acceptsHtml) return response;
-    const fallbackUrl = new URL('/static/index.html', request.url);
-    return env.ASSETS.fetch(new Request(fallbackUrl, request));
+
+    for (const prefix of assetPrefixes) {
+      const fallbackUrl = new URL(prefix + '/index.html', request.url);
+      response = await env.ASSETS.fetch(new Request(fallbackUrl, request));
+      if (response.status !== 404) return response;
+    }
+
+    return response;
   },
 };
 `);
