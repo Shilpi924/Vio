@@ -96,6 +96,12 @@ npm run test
 npm run test -- --coverage
 ```
 
+### Product Roadmap
+
+The complete phased implementation plan, enhancement backlog, acceptance
+checks, release gates, and immediate next sprint are maintained in
+[IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md).
+
 ---
 
 <div align="center">
