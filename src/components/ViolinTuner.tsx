@@ -1,5 +1,9 @@
+import { CheckCircle2 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { pitchDetectionService } from '../services/pitchDetectionService';
+import { useAppStore } from '../store/useAppStore';
+import { useUserProfileStore } from '../store/useUserProfileStore';
 
 const STRINGS = [
   { name: 'G', frequency: 196.00, color: 'from-red-500 to-red-600', emoji: '🔴' },
@@ -9,11 +13,20 @@ const STRINGS = [
 ];
 
 export default function ViolinTuner() {
+  const [searchParams] = useSearchParams();
+  const fromPlan = searchParams.get('from') === 'plan';
+  const activeProfileId = useUserProfileStore((state) => state.activeProfileId);
+  const recordPracticeSession = useAppStore((state) => state.recordPracticeSession);
   const [currentString, setCurrentString] = useState(0);
   const [isListening, setIsListening] = useState(false);
   const [centsOff, setCentsOff] = useState(0);
+  const [tunedStrings, setTunedStrings] = useState<string[]>([]);
+  const [complete, setComplete] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isTransitioningRef = useRef(false);
+  const stableHitsRef = useRef(0);
+  const recordedRef = useRef(false);
+  const startedAtRef = useRef(Date.now());
 
   const handleStringSelect = (index: number) => {
     if (isTransitioningRef.current) return;
@@ -28,6 +41,7 @@ export default function ViolinTuner() {
       }
     }
     setCentsOff(0);
+    stableHitsRef.current = 0;
     
     setTimeout(() => {
       isTransitioningRef.current = false;
@@ -42,14 +56,45 @@ export default function ViolinTuner() {
     try {
       await pitchDetectionService.start((_noteName: string, frequency: number) => {
         const targetFreq = STRINGS[currentString].frequency;
-        const freqDiff = frequency - targetFreq;
-        setCentsOff(Math.round(freqDiff * 100 / targetFreq * 12)); // Convert Hz to cents
+        const nextCents = Math.round(1200 * Math.log2(frequency / targetFreq));
+        setCentsOff(nextCents);
+
+        if (Math.abs(nextCents) <= 5) {
+          stableHitsRef.current += 1;
+          if (stableHitsRef.current >= 3) {
+            const stringName = STRINGS[currentString].name;
+            setTunedStrings((previous) => previous.includes(stringName) ? previous : [...previous, stringName]);
+          }
+        } else {
+          stableHitsRef.current = 0;
+        }
       });
     } catch (error) {
       console.error('Failed to start pitch detection:', error);
       setIsListening(false);
     }
   };
+
+  useEffect(() => {
+    if (tunedStrings.length < STRINGS.length || recordedRef.current) return;
+
+    recordedRef.current = true;
+    pitchDetectionService.stop();
+    setIsListening(false);
+    setComplete(true);
+    recordPracticeSession({
+      profileId: activeProfileId,
+      startedAt: new Date(startedAtRef.current).toISOString(),
+      durationSeconds: Math.max(30, Math.round((Date.now() - startedAtRef.current) / 1000)),
+      activity: 'tuner',
+      title: 'Four-string tuning check',
+      notesPlayed: STRINGS.length,
+      correctNotes: STRINGS.length,
+      accuracy: 100,
+      hardestNotes: [],
+      completed: true,
+    });
+  }, [activeProfileId, recordPracticeSession, tunedStrings]);
 
   const stopListening = () => {
     pitchDetectionService.stop();
@@ -104,6 +149,25 @@ export default function ViolinTuner() {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">🎻 Violin Tuner</h2>
+      <div className="mb-6 rounded-2xl bg-purple-50 p-4 text-center">
+        <p className="font-bold text-purple-950">{tunedStrings.length} of {STRINGS.length} strings tuned</p>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-purple-100" aria-label={`${tunedStrings.length} of 4 strings tuned`}>
+          <div className="h-full bg-emerald-500 transition-all" style={{ width: `${(tunedStrings.length / STRINGS.length) * 100}%` }} />
+        </div>
+      </div>
+
+      {complete ? (
+        <div className="mb-6 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-6 text-center" role="status">
+          <CheckCircle2 className="mx-auto text-emerald-600" size={42} aria-hidden="true" />
+          <h3 className="mt-3 text-2xl font-black text-emerald-950">Your violin is ready</h3>
+          <p className="mt-1 text-emerald-800">The four-string check has been added to your practice history.</p>
+          {fromPlan ? (
+            <Link to="/practice-plan" className="btn-primary mt-4 bg-emerald-600 hover:bg-emerald-500">
+              Continue daily plan
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
       
       {/* String Selection - Big Colorful Buttons */}
       <div className="grid grid-cols-4 gap-4 mb-8">
@@ -111,6 +175,7 @@ export default function ViolinTuner() {
           <button
             key={string.name}
             onClick={() => handleStringSelect(index)}
+            aria-label={`${string.name} string${tunedStrings.includes(string.name) ? ', tuned' : ''}`}
             className={`py-6 rounded-2xl font-bold text-white text-3xl transition-all transform hover:scale-105 active:scale-95 ${
               currentString === index
                 ? `bg-gradient-to-br ${string.color} shadow-2xl scale-110 ring-4 ring-yellow-400`
@@ -119,6 +184,7 @@ export default function ViolinTuner() {
           >
             <div className="text-4xl mb-1">{string.emoji}</div>
             <div>{string.name}</div>
+            {tunedStrings.includes(string.name) ? <div className="mt-1 text-sm">✓ tuned</div> : null}
           </button>
         ))}
       </div>
@@ -179,13 +245,16 @@ export default function ViolinTuner() {
       {/* Big Start/Stop Button */}
       <button
         onClick={isListening ? stopListening : startListening}
+        disabled={complete}
         className={`w-full py-6 rounded-2xl font-bold text-white text-2xl transition-all transform hover:scale-105 active:scale-95 shadow-xl ${
-          isListening
+          complete
+            ? 'bg-emerald-600 opacity-80'
+            : isListening
             ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
             : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
         }`}
       >
-        {isListening ? '⏹️ Stop' : '🎤 Start Tuning'}
+        {complete ? '✓ Tuning complete' : isListening ? '⏹️ Stop' : '🎤 Start Tuning'}
       </button>
 
       {/* Kid-Friendly Instructions */}

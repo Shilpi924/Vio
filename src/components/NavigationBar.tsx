@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const navItems = [
   { path: '/', labelKey: 'nav.home', icon: Home },
-  { path: '/beginner-path', labelKey: 'nav.learn', icon: Sparkles },
+  { path: '/practice-plan', labelKey: 'nav.today', icon: Sparkles },
   { path: '/lessons', labelKey: 'nav.songs', icon: Music2 },
   { path: '/curriculum', labelKey: 'nav.path', icon: BookOpen },
   { path: '/statistics', labelKey: 'nav.progress', icon: BarChart3 },

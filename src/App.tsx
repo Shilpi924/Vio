@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import i18n from './i18n';
-import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import AIChatBot from './components/AIChatBot';
 import NavigationBar from './components/NavigationBar';
 import { sampleLessons } from './data/lessons';
@@ -26,6 +26,8 @@ const WeeklyChallenges = lazy(() => import('./components/WeeklyChallenges'));
 const BeginnerPath = lazy(() => import('./pages/BeginnerPath'));
 const ChordTrainerPage = lazy(() => import('./pages/ChordTrainerPage'));
 const CurriculumPage = lazy(() => import('./pages/CurriculumPage'));
+const DailyPracticePlanPage = lazy(() => import('./pages/DailyPracticePlanPage'));
+const DiagnosticPage = lazy(() => import('./pages/DiagnosticPage'));
 const EarTrainingPage = lazy(() => import('./pages/EarTrainingPage'));
 const FreePlayPage = lazy(() => import('./pages/FreePlayPage'));
 const HandPositioningPage = lazy(() => import('./pages/HandPositioningPage'));
@@ -46,6 +48,7 @@ const TutorialsPage = lazy(() => import('./pages/TutorialsPage'));
 function LessonRoute() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const customLessons = useAppStore((state) => state.customLessons);
   const activeProfileId = useUserProfileStore((state) => state.activeProfileId);
   const lesson = [...sampleLessons, ...customLessons].find((candidate) => candidate.id === lessonId);
@@ -66,7 +69,7 @@ function LessonRoute() {
               profileId: activeProfileId,
               title: lesson.title,
             });
-            navigate('/lessons', { replace: true });
+            navigate(searchParams.get('from') === 'plan' ? '/practice-plan' : '/lessons', { replace: true });
           }}
         />
       </div>
@@ -115,6 +118,8 @@ function App() {
       <Suspense fallback={<div className="mx-auto max-w-5xl px-4 py-16 text-center text-slate-600" role="status">Loading practice space…</div>}>
         <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/diagnostic" element={<DiagnosticPage />} />
+        <Route path="/practice-plan" element={<DailyPracticePlanPage />} />
         <Route path="/beginner-path" element={<BeginnerPath />} />
         <Route path="/fingerboard" element={<InteractiveFingerboard />} />
         <Route path="/audio-compare" element={<AudioComparison targetNote="A4" />} />

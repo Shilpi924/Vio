@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Headphones, Music2, Target, TimerReset } from 'lucide-react';
+import { ArrowRight, BookOpen, ClipboardCheck, Headphones, Music2, Target, TimerReset } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
@@ -8,7 +8,11 @@ export default function HomePage() {
   const statistics = useAppStore((state) => state.statistics);
   const sessions = useAppStore((state) => state.practiceSessions);
   const profile = useUserProfileStore((state) => state.profiles[state.activeProfileId]);
-  const nextPath = profile?.completedLessons.length ? '/lessons' : '/beginner-path';
+  const diagnostic = useAppStore((state) => state.diagnosticResults[profile.id]);
+  const plan = useAppStore((state) => state.dailyPracticePlans[profile.id]);
+  const nextPath = diagnostic ? '/practice-plan' : '/diagnostic';
+  const completedPlanTasks = plan?.completedTaskIds.length ?? 0;
+  const totalPlanTasks = plan?.tasks.length ?? 4;
 
   const formatTime = (seconds: number) => {
     const minutes = Math.round(seconds / 60);
@@ -29,7 +33,7 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button type="button" onClick={() => navigate(nextPath)} className="btn-primary bg-purple-950 hover:bg-purple-900">
-                {profile?.completedLessons.length ? 'Continue practicing' : 'Start the beginner path'}
+                {diagnostic ? 'Continue today’s plan' : 'Build my daily plan'}
                 <ArrowRight size={18} aria-hidden="true" />
               </button>
               <button type="button" onClick={() => navigate('/tuner')} className="btn-secondary">
@@ -39,13 +43,15 @@ export default function HomePage() {
           </div>
 
           <aside className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-2xl sm:p-8">
-            <p className="text-sm font-bold uppercase tracking-widest text-purple-300">Your practice signal</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-purple-300">
+              {diagnostic ? 'Today’s practice signal' : 'Your practice signal'}
+            </p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               {[
                 ['Practice', formatTime(statistics.totalPracticeTime)],
                 ['Accuracy', `${statistics.accuracy}%`],
+                ['Today', diagnostic ? `${completedPlanTasks}/${totalPlanTasks}` : 'Not set'],
                 ['Sessions', String(sessions.length)],
-                ['Lessons', String(profile?.completedLessons.length ?? 0)],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-2xl bg-white/10 p-4">
                   <p className="text-sm text-slate-300">{label}</p>
@@ -54,7 +60,9 @@ export default function HomePage() {
               ))}
             </div>
             <p className="mt-5 text-sm leading-6 text-slate-300">
-              Progress appears only after recorded practice—never from sample or invented activity.
+              {diagnostic
+                ? `Your ${plan?.targetMinutes ?? diagnostic.targetMinutes}-minute plan updates as real practice is completed.`
+                : 'Take a three-minute diagnostic to get a plan matched to your pitch, rhythm, and reading skills.'}
             </p>
           </aside>
         </div>
@@ -70,12 +78,12 @@ export default function HomePage() {
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
+              ['/practice-plan', 'Follow today’s plan', 'Get the next best exercise based on your real results.', ClipboardCheck],
               ['/beginner-path', 'Learn step by step', 'Build safe fundamentals in a clear order.', BookOpen],
               ['/lessons', 'Practice a song', 'Listen, play and receive note-by-note feedback.', Music2],
               ['/tuner', 'Tune accurately', 'Use the microphone to tune each open string.', Target],
               ['/ear-training', 'Train your ear', 'Recognize pitches and intervals by sound.', Headphones],
               ['/rhythm-training', 'Strengthen rhythm', 'Tap patterns and build steady timing.', TimerReset],
-              ['/statistics', 'Review progress', 'See sessions, accuracy and difficult notes.', Target],
             ].map(([path, title, description, Icon]) => (
               <button
                 type="button"

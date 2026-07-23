@@ -81,6 +81,40 @@ export interface PracticeSession {
   completed: boolean;
 }
 
+export type DiagnosticDimension = 'pitch' | 'rhythm' | 'reading';
+
+export interface DiagnosticResult {
+  id: string;
+  profileId: string;
+  completedAt: string;
+  targetMinutes: 10 | 15 | 20;
+  scores: Record<DiagnosticDimension, number>;
+}
+
+export interface DailyPracticeTask {
+  id: string;
+  title: string;
+  description: string;
+  reason: string;
+  durationMinutes: number;
+  path: string;
+  matchActivity?: PracticeSession['activity'];
+  matchLessonId?: string;
+  matchTitle?: string;
+}
+
+export interface DailyPracticePlan {
+  id: string;
+  profileId: string;
+  date: string;
+  generatedAt: string;
+  targetMinutes: number;
+  focus: DiagnosticDimension;
+  adaptationSummary: string;
+  tasks: DailyPracticeTask[];
+  completedTaskIds: string[];
+}
+
 export interface Settings {
   showFingerboardLabels: boolean;
   showNoteNames: boolean;

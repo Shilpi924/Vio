@@ -1,6 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState, Lesson, Settings, Statistics, MIDIDevice, LessonProgress, PracticeSession } from '../types';
+import type {
+  AppState,
+  DailyPracticePlan,
+  DiagnosticResult,
+  Lesson,
+  Settings,
+  Statistics,
+  MIDIDevice,
+  LessonProgress,
+  PracticeSession,
+} from '../types';
+import { localDateKey, matchesPracticeTask } from '../features/practicePlan/planEngine';
 
 interface AppStore extends AppState {
   // Practice session state
@@ -21,6 +32,10 @@ interface AppStore extends AppState {
   completeLesson: (lessonId: string) => void;
   practiceSessions: PracticeSession[];
   recordPracticeSession: (session: Omit<PracticeSession, 'id'>) => void;
+  diagnosticResults: Record<string, DiagnosticResult>;
+  saveDiagnosticResult: (result: DiagnosticResult) => void;
+  dailyPracticePlans: Record<string, DailyPracticePlan>;
+  saveDailyPracticePlan: (plan: DailyPracticePlan) => void;
 
   // MIDI
   midiDevices: MIDIDevice[];
@@ -132,6 +147,16 @@ export const useAppStore = create<AppStore>()(
           },
         })),
       practiceSessions: [],
+      diagnosticResults: {},
+      saveDiagnosticResult: (result) =>
+        set((state) => ({
+          diagnosticResults: { ...state.diagnosticResults, [result.profileId]: result },
+        })),
+      dailyPracticePlans: {},
+      saveDailyPracticePlan: (plan) =>
+        set((state) => ({
+          dailyPracticePlans: { ...state.dailyPracticePlans, [plan.profileId]: plan },
+        })),
       recordPracticeSession: (session) =>
         set((state) => {
           const nextSession: PracticeSession = {
@@ -140,8 +165,25 @@ export const useAppStore = create<AppStore>()(
           };
           const notesPlayed = state.statistics.notesPlayed + session.notesPlayed;
           const correctNotes = state.statistics.correctNotes + session.correctNotes;
+          const activePlan = state.dailyPracticePlans[session.profileId];
+          const sessionDate = localDateKey(new Date(session.startedAt));
+          const updatedPlans = activePlan?.date === sessionDate
+            ? {
+                ...state.dailyPracticePlans,
+                [session.profileId]: {
+                  ...activePlan,
+                  completedTaskIds: Array.from(new Set([
+                    ...activePlan.completedTaskIds,
+                    ...activePlan.tasks
+                      .filter((task) => matchesPracticeTask(task, nextSession))
+                      .map((task) => task.id),
+                  ])),
+                },
+              }
+            : state.dailyPracticePlans;
           return {
             practiceSessions: [nextSession, ...state.practiceSessions].slice(0, 100),
+            dailyPracticePlans: updatedPlans,
             statistics: {
               ...state.statistics,
               totalPracticeTime: state.statistics.totalPracticeTime + session.durationSeconds,
@@ -194,6 +236,8 @@ export const useAppStore = create<AppStore>()(
         lessonProgress: state.lessonProgress,
         customLessons: state.customLessons,
         practiceSessions: state.practiceSessions,
+        diagnosticResults: state.diagnosticResults,
+        dailyPracticePlans: state.dailyPracticePlans,
       }),
     }
   )

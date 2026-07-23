@@ -5,7 +5,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
-      nav: { home: 'Home', learn: 'Learn', songs: 'Songs', path: 'Path', progress: 'Progress', settings: 'Settings' },
+      nav: { home: 'Home', today: 'Today', learn: 'Learn', songs: 'Songs', path: 'Path', progress: 'Progress', settings: 'Settings' },
       home: {
         welcome: "Hello, {{name}}! 🎻",
         tagline: "Let's make some music!",
@@ -44,7 +44,7 @@ const resources = {
   },
   zh: {
     translation: {
-      nav: { home: '主页', learn: '学习', songs: '乐曲', path: '路径', progress: '进度', settings: '设置' },
+      nav: { home: '主页', today: '今天', learn: '学习', songs: '乐曲', path: '路径', progress: '进度', settings: '设置' },
       home: {
         welcome: "你好，{{name}}！🎻",
         tagline: "让我们创作一些音乐吧！",
@@ -83,7 +83,7 @@ const resources = {
   },
   ja: {
     translation: {
-      nav: { home: 'ホーム', learn: '学ぶ', songs: '曲', path: 'コース', progress: '進捗', settings: '設定' },
+      nav: { home: 'ホーム', today: '今日', learn: '学ぶ', songs: '曲', path: 'コース', progress: '進捗', settings: '設定' },
       home: {
         welcome: "こんにちは、{{name}}さん！🎻",
         tagline: "音楽を作りましょう！",
@@ -122,7 +122,7 @@ const resources = {
   },
   de: {
     translation: {
-      nav: { home: 'Start', learn: 'Lernen', songs: 'Stücke', path: 'Lernweg', progress: 'Fortschritt', settings: 'Einstellungen' },
+      nav: { home: 'Start', today: 'Heute', learn: 'Lernen', songs: 'Stücke', path: 'Lernweg', progress: 'Fortschritt', settings: 'Einstellungen' },
       home: {
         welcome: "Hallo, {{name}}! 🎻",
         tagline: "Lass uns Musik machen!",
@@ -161,7 +161,7 @@ const resources = {
   },
   es: {
     translation: {
-      nav: { home: 'Inicio', learn: 'Aprender', songs: 'Canciones', path: 'Ruta', progress: 'Progreso', settings: 'Ajustes' },
+      nav: { home: 'Inicio', today: 'Hoy', learn: 'Aprender', songs: 'Canciones', path: 'Ruta', progress: 'Progreso', settings: 'Ajustes' },
       home: {
         welcome: "¡Hola, {{name}}! 🎻",
         tagline: "¡Hagamos algo de música!",

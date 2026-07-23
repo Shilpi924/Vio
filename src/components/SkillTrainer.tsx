@@ -1,5 +1,6 @@
-import { CheckCircle2, Headphones, RotateCcw, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Headphones, RotateCcw, XCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { audioService } from '../services/audioService';
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
@@ -20,6 +21,8 @@ interface SkillTrainerProps {
 }
 
 export default function SkillTrainer({ title, description, skill, items }: SkillTrainerProps) {
+  const [searchParams] = useSearchParams();
+  const fromPlan = searchParams.get('from') === 'plan';
   const activeProfileId = useUserProfileStore((state) => state.activeProfileId);
   const recordPracticeSession = useAppStore((state) => state.recordPracticeSession);
   const [index, setIndex] = useState(0);
@@ -53,7 +56,7 @@ export default function SkillTrainer({ title, description, skill, items }: Skill
       return;
     }
 
-      const finalCorrect = correct;
+    const finalCorrect = correct;
     const durationSeconds = Math.max(30, Math.round((Date.now() - startedAt.current) / 1000));
     recordPracticeSession({
       profileId: activeProfileId,
@@ -87,9 +90,16 @@ export default function SkillTrainer({ title, description, skill, items }: Skill
           <p className="mt-5 text-sm font-bold uppercase tracking-widest text-purple-300">{skill} complete</p>
           <h1 className="mt-2 text-4xl font-black">{correct} of {items.length} correct</h1>
           <p className="mt-3 text-slate-300">This result has been added to your real practice history.</p>
-          <button type="button" onClick={restart} className="btn-primary mt-7 bg-purple-600 hover:bg-purple-500">
-            <RotateCcw size={18} aria-hidden="true" /> Practice again
-          </button>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            {fromPlan ? (
+              <Link to="/practice-plan" className="btn-primary bg-emerald-500 text-slate-950 hover:bg-emerald-400">
+                Continue daily plan <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            ) : null}
+            <button type="button" onClick={restart} className="btn-primary bg-purple-600 hover:bg-purple-500">
+              <RotateCcw size={18} aria-hidden="true" /> Practice again
+            </button>
+          </div>
         </div>
       </main>
     );
