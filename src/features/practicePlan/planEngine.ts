@@ -20,12 +20,12 @@ export const weakestDimension = (scores: DiagnosticResult['scores']): Diagnostic
 
 const focusTask: Record<DiagnosticDimension, Omit<DailyPracticeTask, 'id' | 'durationMinutes'>> = {
   pitch: {
-    title: 'Open-string ear check',
-    description: 'Listen, identify, and compare open-string pitches.',
-    reason: 'Your pitch-listening score is the clearest growth opportunity.',
-    path: '/ear-training',
+    title: 'Pitch Orbit intonation flight',
+    description: 'Center first-position notes, then repeat your two hardest landings.',
+    reason: 'Your pitch score needs hands-on finger-placement feedback today.',
+    path: '/intonation-coach',
     matchActivity: 'trainer',
-    matchTitle: 'Open-string ear training',
+    matchTitle: 'Intonation Coach: First-position orbit',
   },
   rhythm: {
     title: 'Rhythm reset',
@@ -47,6 +47,7 @@ const focusTask: Record<DiagnosticDimension, Omit<DailyPracticeTask, 'id' | 'dur
 
 const dimensionBySessionTitle: Partial<Record<string, DiagnosticDimension>> = {
   'Open-string ear training': 'pitch',
+  'Intonation Coach: First-position orbit': 'pitch',
   'Read and count rhythm': 'rhythm',
   'Name notes on the violin': 'reading',
 };

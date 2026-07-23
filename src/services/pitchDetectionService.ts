@@ -89,7 +89,7 @@ class PitchDetectionService {
       // Debounce logic: only trigger if we consistently detect the same note
       if (noteName === this.lastDetectedNote) {
         this.noteHoldCounter++;
-        if (this.noteHoldCounter === 2 && this.callback) { // trigger on the 3rd consistent frame
+        if (this.noteHoldCounter >= 2 && this.callback) {
           this.callback(noteName, frequency);
         }
       } else {

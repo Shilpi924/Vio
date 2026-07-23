@@ -82,7 +82,7 @@ export default function HomePage() {
               ['/beginner-path', 'Learn step by step', 'Build safe fundamentals in a clear order.', BookOpen],
               ['/lessons', 'Practice a song', 'Listen, play and receive note-by-note feedback.', Music2],
               ['/tuner', 'Tune accurately', 'Use the microphone to tune each open string.', Target],
-              ['/ear-training', 'Train your ear', 'Recognize pitches and intervals by sound.', Headphones],
+              ['/intonation-coach', 'Center every note', 'Get live sharp/flat guidance and a personal rescue loop.', Headphones],
               ['/rhythm-training', 'Strengthen rhythm', 'Tap patterns and build steady timing.', TimerReset],
             ].map(([path, title, description, Icon]) => (
               <button

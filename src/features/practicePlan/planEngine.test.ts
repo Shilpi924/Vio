@@ -44,7 +44,7 @@ const session = (overrides: Partial<PracticeSession>): PracticeSession => ({
   startedAt: new Date().toISOString(),
   durationSeconds: 180,
   activity: 'trainer',
-  title: 'Open-string ear training',
+  title: 'Intonation Coach: First-position orbit',
   notesPlayed: 6,
   correctNotes: 6,
   accuracy: 100,
@@ -71,7 +71,7 @@ describe('daily practice plan engine', () => {
 
   it('shifts tomorrow-facing focus when recent practice improves a weak skill', () => {
     const sessions = [
-      session({ title: 'Open-string ear training', accuracy: 100 }),
+      session({ title: 'Intonation Coach: First-position orbit', accuracy: 100 }),
       session({ id: 'rhythm', title: 'Read and count rhythm', accuracy: 0 }),
     ];
     const plan = buildDailyPlan({ profile, diagnostic, sessions, lessonTitles });

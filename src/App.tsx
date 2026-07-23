@@ -32,6 +32,7 @@ const EarTrainingPage = lazy(() => import('./pages/EarTrainingPage'));
 const FreePlayPage = lazy(() => import('./pages/FreePlayPage'));
 const HandPositioningPage = lazy(() => import('./pages/HandPositioningPage'));
 const IntervalTrainingPage = lazy(() => import('./pages/IntervalTrainingPage'));
+const IntonationCoachPage = lazy(() => import('./pages/IntonationCoachPage'));
 const LessonCreatorPage = lazy(() => import('./pages/LessonCreatorPage'));
 const LessonLibraryPage = lazy(() => import('./pages/LessonLibraryPage'));
 const NoteNamingPage = lazy(() => import('./pages/NoteNamingPage'));
@@ -139,6 +140,7 @@ function App() {
         <Route path="/hand-positioning" element={<HandPositioningPage />} />
         <Route path="/performance" element={<PerformanceModePage />} />
         <Route path="/interval-training" element={<IntervalTrainingPage />} />
+        <Route path="/intonation-coach" element={<IntonationCoachPage />} />
         <Route path="/chord-training" element={<ChordTrainerPage />} />
         <Route path="/song-upload" element={<SongUploadPage />} />
         <Route path="/lesson-creator" element={<LessonCreatorPage />} />
