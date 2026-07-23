@@ -14,11 +14,17 @@ for (const entry of await readdir(distDir)) {
 await mkdir(serverDir, { recursive: true });
 await writeFile(new URL('index.js', serverDir), `export default {
   async fetch(request, env) {
-    const response = await env.ASSETS.fetch(request);
+    const url = new URL(request.url);
+    let response = await env.ASSETS.fetch(request);
+    if (response.status === 404) {
+      const packagedAssetUrl = new URL(\`/static\${url.pathname}\`, request.url);
+      packagedAssetUrl.search = url.search;
+      response = await env.ASSETS.fetch(new Request(packagedAssetUrl, request));
+    }
     if (response.status !== 404 || request.method !== 'GET') return response;
     const acceptsHtml = request.headers.get('accept')?.includes('text/html');
     if (!acceptsHtml) return response;
-    const fallbackUrl = new URL('/index.html', request.url);
+    const fallbackUrl = new URL('/static/index.html', request.url);
     return env.ASSETS.fetch(new Request(fallbackUrl, request));
   },
 };
