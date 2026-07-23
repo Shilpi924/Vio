@@ -56,6 +56,18 @@ export default function StatisticsPage() {
           </div>
         </div>
 
+        <button
+          type="button"
+          onClick={() => navigate('/intonation-insights')}
+          className="mb-6 w-full rounded-3xl bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 p-6 text-left text-white shadow-xl transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-purple-700"
+        >
+          <span className="text-3xl" aria-hidden="true">🪐</span>
+          <span className="mt-4 block text-xs font-black uppercase tracking-[0.2em] text-cyan-300">New: Intonation Insights</span>
+          <span className="mt-1 block text-2xl font-black">See your pitch fingerprint</span>
+          <span className="mt-2 block text-sm leading-6 text-slate-300">Compare every first-position note, string, and finger—and see whether your centering is improving over time.</span>
+          <span className="mt-4 block font-bold text-amber-300">Open insights →</span>
+        </button>
+
         <PracticeSessionSummary />
 
         {/* Achievement */}

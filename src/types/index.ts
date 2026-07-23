@@ -79,6 +79,17 @@ export interface PracticeSession {
   accuracy: number;
   hardestNotes: string[];
   completed: boolean;
+  intonationDetails?: IntonationNoteResult[];
+}
+
+export interface IntonationNoteResult {
+  note: string;
+  string: ViolinString;
+  finger: FingerNumber;
+  cents: number;
+  struggleFrames: number;
+  passed: boolean;
+  phase: 'flight' | 'rescue';
 }
 
 export type DiagnosticDimension = 'pitch' | 'rhythm' | 'reading';

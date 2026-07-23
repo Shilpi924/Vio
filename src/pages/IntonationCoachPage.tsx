@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Headphones, Mic, RotateCcw, SkipForward, Sparkles } from 'lucide-react';
+import { ArrowRight, BarChart3, Check, Headphones, Mic, RotateCcw, SkipForward, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
@@ -83,6 +83,19 @@ export default function IntonationCoachPage() {
       accuracy: Math.round((passed / Math.max(1, finalAttempts.length)) * 100),
       hardestNotes,
       completed: true,
+      intonationDetails: finalAttempts.map((attempt, attemptIndex) => {
+        const noteTarget = FIRST_POSITION_ORBIT.find((candidate) => candidate.note === attempt.note)
+          ?? FIRST_POSITION_ORBIT[0];
+        return {
+          note: attempt.note,
+          string: noteTarget.string,
+          finger: noteTarget.finger,
+          cents: attempt.cents,
+          struggleFrames: attempt.struggleFrames,
+          passed: attempt.passed,
+          phase: attemptIndex < FIRST_POSITION_ORBIT.length ? 'flight' : 'rescue',
+        };
+      }),
     });
     phaseRef.current = 'complete';
     setPhase('complete');
@@ -203,6 +216,9 @@ export default function IntonationCoachPage() {
                 Continue daily plan <ArrowRight size={18} />
               </Link>
             ) : null}
+            <Link to="/intonation-insights" className="btn-primary bg-cyan-300 text-slate-950 hover:bg-cyan-200">
+              View pitch fingerprint <BarChart3 size={18} />
+            </Link>
             <button type="button" onClick={restart} className="btn-secondary border-white/20 bg-white/10 text-white hover:bg-white/20">
               <RotateCcw size={18} /> Fly again
             </button>
