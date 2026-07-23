@@ -68,6 +68,7 @@ export interface Statistics {
 
 export interface PracticeSession {
   id: string;
+  schemaVersion?: number;
   profileId: string;
   startedAt: string;
   durationSeconds: number;
@@ -80,6 +81,8 @@ export interface PracticeSession {
   hardestNotes: string[];
   completed: boolean;
   intonationDetails?: IntonationNoteResult[];
+  rhythmDetails?: RhythmSessionDetails;
+  calibrationId?: string;
 }
 
 export interface IntonationNoteResult {
@@ -90,6 +93,46 @@ export interface IntonationNoteResult {
   struggleFrames: number;
   passed: boolean;
   phase: 'flight' | 'rescue';
+}
+
+export type RhythmBeatQuality = 'early' | 'centered' | 'late' | 'missed';
+
+export interface RhythmBeatResult {
+  beatIndex: number;
+  expectedMs: number;
+  detectedMs?: number;
+  deltaMs?: number;
+  quality: RhythmBeatQuality;
+}
+
+export interface RhythmSessionDetails {
+  patternId: string;
+  patternName: string;
+  bpm: number;
+  beatDurationMs: number;
+  latencyOffsetMs: number;
+  matchToleranceMs: number;
+  beatResults: RhythmBeatResult[];
+}
+
+export type AudioCalibrationStatus = 'ready' | 'needs-signal' | 'needs-more-practice' | 'unsupported';
+
+export interface AudioCalibrationResult {
+  id: string;
+  schemaVersion: 1;
+  profileId: string;
+  completedAt: string;
+  browserLabel: string;
+  sampleRate: number;
+  noiseRms: number;
+  signalRms: number;
+  signalToNoiseDb: number;
+  clippingRate: number;
+  latencyOffsetMs: number;
+  recommendedTempo: number;
+  confidence: number;
+  status: AudioCalibrationStatus;
+  notes: string[];
 }
 
 export type DiagnosticDimension = 'pitch' | 'rhythm' | 'reading';
@@ -112,6 +155,7 @@ export interface DailyPracticeTask {
   matchActivity?: PracticeSession['activity'];
   matchLessonId?: string;
   matchTitle?: string;
+  matchTitleIncludes?: string;
 }
 
 export interface DailyPracticePlan {

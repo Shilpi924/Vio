@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, ClipboardCheck, Headphones, Music2, Target, TimerReset } from 'lucide-react';
+import { ArrowRight, BookOpen, ClipboardCheck, Headphones, Mic, Music2, Target, TimerReset } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { useUserProfileStore } from '../store/useUserProfileStore';
@@ -8,11 +8,15 @@ export default function HomePage() {
   const statistics = useAppStore((state) => state.statistics);
   const sessions = useAppStore((state) => state.practiceSessions);
   const profile = useUserProfileStore((state) => state.profiles[state.activeProfileId]);
+  const calibration = useAppStore((state) => state.audioCalibrationByProfile[profile.id]);
   const diagnostic = useAppStore((state) => state.diagnosticResults[profile.id]);
   const plan = useAppStore((state) => state.dailyPracticePlans[profile.id]);
   const nextPath = diagnostic ? '/practice-plan' : '/diagnostic';
   const completedPlanTasks = plan?.completedTaskIds.length ?? 0;
   const totalPlanTasks = plan?.tasks.length ?? 4;
+  const calibrationLabel = calibration
+    ? `Calibrated ${new Date(calibration.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+    : 'Microphone not calibrated yet';
 
   const formatTime = (seconds: number) => {
     const minutes = Math.round(seconds / 60);
@@ -39,6 +43,9 @@ export default function HomePage() {
               <button type="button" onClick={() => navigate('/tuner')} className="btn-secondary">
                 Tune my violin
               </button>
+              <button type="button" onClick={() => navigate('/audio-check')} className="btn-secondary">
+                Calibrate mic
+              </button>
             </div>
           </div>
 
@@ -46,6 +53,12 @@ export default function HomePage() {
             <p className="text-sm font-bold uppercase tracking-widest text-purple-300">
               {diagnostic ? 'Today’s practice signal' : 'Your practice signal'}
             </p>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+              <span className="flex items-center gap-2 font-bold text-white">
+                <Mic size={16} aria-hidden="true" /> {calibration ? 'Mic calibrated' : 'Microphone setup'}
+              </span>
+              <p className="mt-1">{calibrationLabel}</p>
+            </div>
             <div className="mt-6 grid grid-cols-2 gap-3">
               {[
                 ['Practice', formatTime(statistics.totalPracticeTime)],
@@ -83,7 +96,8 @@ export default function HomePage() {
               ['/lessons', 'Practice a song', 'Listen, play and receive note-by-note feedback.', Music2],
               ['/tuner', 'Tune accurately', 'Use the microphone to tune each open string.', Target],
               ['/intonation-coach', 'Center every note', 'Get live sharp/flat guidance and a personal rescue loop.', Headphones],
-              ['/rhythm-training', 'Strengthen rhythm', 'Tap patterns and build steady timing.', TimerReset],
+              ['/rhythm-pulse', 'Strengthen rhythm', 'Tap patterns and build steady timing.', TimerReset],
+              ['/audio-check', 'Calibrate mic', 'Measure room noise, signal strength and timing offset.', Mic],
             ].map(([path, title, description, Icon]) => (
               <button
                 type="button"

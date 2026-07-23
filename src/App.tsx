@@ -27,6 +27,7 @@ const BeginnerPath = lazy(() => import('./pages/BeginnerPath'));
 const ChordTrainerPage = lazy(() => import('./pages/ChordTrainerPage'));
 const CurriculumPage = lazy(() => import('./pages/CurriculumPage'));
 const DailyPracticePlanPage = lazy(() => import('./pages/DailyPracticePlanPage'));
+const AudioCheckPage = lazy(() => import('./pages/AudioCheckPage'));
 const DiagnosticPage = lazy(() => import('./pages/DiagnosticPage'));
 const EarTrainingPage = lazy(() => import('./pages/EarTrainingPage'));
 const FreePlayPage = lazy(() => import('./pages/FreePlayPage'));
@@ -122,6 +123,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/diagnostic" element={<DiagnosticPage />} />
         <Route path="/practice-plan" element={<DailyPracticePlanPage />} />
+        <Route path="/audio-check" element={<AudioCheckPage />} />
         <Route path="/beginner-path" element={<BeginnerPath />} />
         <Route path="/fingerboard" element={<InteractiveFingerboard />} />
         <Route path="/audio-compare" element={<AudioComparison targetNote="A4" />} />
@@ -146,6 +148,7 @@ function App() {
         <Route path="/chord-training" element={<ChordTrainerPage />} />
         <Route path="/song-upload" element={<SongUploadPage />} />
         <Route path="/lesson-creator" element={<LessonCreatorPage />} />
+        <Route path="/rhythm-pulse" element={<RhythmTrainingPage />} />
         <Route path="/rhythm-training" element={<RhythmTrainingPage />} />
         <Route path="/tuner" element={<ViolinTuner />} />
         <Route path="/timer" element={<PracticeTimer />} />

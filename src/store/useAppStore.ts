@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type {
+  AudioCalibrationResult,
   AppState,
   DailyPracticePlan,
   DiagnosticResult,
@@ -36,6 +37,8 @@ interface AppStore extends AppState {
   saveDiagnosticResult: (result: DiagnosticResult) => void;
   dailyPracticePlans: Record<string, DailyPracticePlan>;
   saveDailyPracticePlan: (plan: DailyPracticePlan) => void;
+  audioCalibrationByProfile: Record<string, AudioCalibrationResult>;
+  saveAudioCalibrationResult: (result: AudioCalibrationResult) => void;
 
   // MIDI
   midiDevices: MIDIDevice[];
@@ -148,6 +151,7 @@ export const useAppStore = create<AppStore>()(
         })),
       practiceSessions: [],
       diagnosticResults: {},
+      audioCalibrationByProfile: {},
       saveDiagnosticResult: (result) =>
         set((state) => ({
           diagnosticResults: { ...state.diagnosticResults, [result.profileId]: result },
@@ -157,11 +161,16 @@ export const useAppStore = create<AppStore>()(
         set((state) => ({
           dailyPracticePlans: { ...state.dailyPracticePlans, [plan.profileId]: plan },
         })),
+      saveAudioCalibrationResult: (result) =>
+        set((state) => ({
+          audioCalibrationByProfile: { ...state.audioCalibrationByProfile, [result.profileId]: result },
+        })),
       recordPracticeSession: (session) =>
         set((state) => {
           const nextSession: PracticeSession = {
             ...session,
             id: `practice_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            schemaVersion: session.schemaVersion ?? 2,
           };
           const notesPlayed = state.statistics.notesPlayed + session.notesPlayed;
           const correctNotes = state.statistics.correctNotes + session.correctNotes;
@@ -238,6 +247,7 @@ export const useAppStore = create<AppStore>()(
         practiceSessions: state.practiceSessions,
         diagnosticResults: state.diagnosticResults,
         dailyPracticePlans: state.dailyPracticePlans,
+        audioCalibrationByProfile: state.audioCalibrationByProfile,
       }),
     }
   )

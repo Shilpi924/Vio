@@ -28,12 +28,12 @@ const focusTask: Record<DiagnosticDimension, Omit<DailyPracticeTask, 'id' | 'dur
     matchTitle: 'Intonation Coach: First-position orbit',
   },
   rhythm: {
-    title: 'Rhythm reset',
+    title: 'Rhythm Pulse timing lab',
     description: 'Count simple patterns before applying them to the bow.',
     reason: 'A steadier internal pulse will make every piece easier.',
-    path: '/rhythm-training',
+    path: '/rhythm-pulse',
     matchActivity: 'trainer',
-    matchTitle: 'Read and count rhythm',
+    matchTitleIncludes: 'Rhythm',
   },
   reading: {
     title: 'Note-reading sprint',
@@ -49,6 +49,9 @@ const dimensionBySessionTitle: Partial<Record<string, DiagnosticDimension>> = {
   'Open-string ear training': 'pitch',
   'Intonation Coach: First-position orbit': 'pitch',
   'Read and count rhythm': 'rhythm',
+  'Rhythm Pulse: Steady Steps': 'rhythm',
+  'Rhythm Pulse: Skip the middle': 'rhythm',
+  'Rhythm Pulse: Off-beat reach': 'rhythm',
   'Name notes on the violin': 'reading',
 };
 
@@ -73,7 +76,8 @@ export function matchesPracticeTask(task: DailyPracticeTask, session: PracticeSe
   if (task.matchLessonId && task.matchLessonId !== session.lessonId) return false;
   if (task.matchActivity && task.matchActivity !== session.activity) return false;
   if (task.matchTitle && task.matchTitle !== session.title) return false;
-  return Boolean(task.matchLessonId || task.matchActivity || task.matchTitle);
+  if (task.matchTitleIncludes && !session.title.includes(task.matchTitleIncludes)) return false;
+  return Boolean(task.matchLessonId || task.matchActivity || task.matchTitle || task.matchTitleIncludes);
 }
 
 export function buildDailyPlan({
