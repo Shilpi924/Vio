@@ -98,6 +98,10 @@ function App() {
   const audioVolume = useAppStore((state) => state.settings.audioVolume);
   const darkMode = useAppStore((state) => state.settings.darkMode);
   const language = useAppStore((state) => state.settings.language ?? 'en');
+  const activeProfileId = useUserProfileStore((state) => state.activeProfileId);
+  const profiles = useUserProfileStore((state) => state.profiles);
+  const activeProfile = profiles[activeProfileId];
+  const ageGroup = activeProfile?.ageGroup ?? '13-17';
   useCloudSync();
 
   useEffect(() => {
@@ -114,6 +118,16 @@ function App() {
     void i18n.changeLanguage(language);
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('age-5-8', 'age-9-12', 'age-13-17', 'age-18-plus');
+    if (ageGroup === '5-8') root.classList.add('age-5-8');
+    else if (ageGroup === '9-12') root.classList.add('age-9-12');
+    else if (ageGroup === '13-17') root.classList.add('age-13-17');
+    else if (ageGroup === '18+') root.classList.add('age-18-plus');
+  }, [ageGroup]);
+
 
   return (
     <div className="min-h-screen">

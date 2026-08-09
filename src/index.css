@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-[#fffdf8] text-gray-900 antialiased;
+    @apply bg-[#fffdf8] text-gray-900 antialiased transition-colors duration-300;
   }
 
   :focus-visible {
@@ -19,6 +19,19 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+
+  /* Modern Theme Styling (Applied dynamically via root ageGroup class) */
+  .age-13-17, .age-18-plus {
+    --color-primary: 139, 92, 246; /* violet-500 */
+    --color-secondary: 20, 184, 166; /* teal-500 */
+    --bg-grad-from: #090514;
+    --bg-grad-to: #0c0a0f;
+  }
+
+  .age-13-17 body, .age-18-plus body {
+    background-color: var(--bg-grad-from);
+    color: #f8fafc;
   }
 
   .dark body {
@@ -43,6 +56,19 @@
     @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl dark:bg-gray-900/70 dark:border-gray-700/50;
   }
 
+  /* Modern High-End Visual elements */
+  .modern-gradient {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(20, 184, 166, 0.05) 100%);
+  }
+
+  .modern-glow-card {
+    @apply border border-purple-500/20 bg-slate-900/60 backdrop-blur-md rounded-2xl p-6 transition-all duration-300 hover:border-purple-500/40 hover:shadow-glow;
+  }
+
+  .modern-text-gradient {
+    @apply bg-gradient-to-r from-purple-400 via-pink-400 to-teal-400 bg-clip-text text-transparent;
+  }
+
   .hide-scrollbar {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
@@ -51,3 +77,4 @@
     display: none;
   }
 }
+
