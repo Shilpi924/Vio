@@ -6,7 +6,7 @@ import * as Tone from 'tone';
 // ---------------------------------------------------------------------------
 
 class AudioService {
-  private synth: Tone.PolySynth | null = null;
+  private synth: Tone.Synth | null = null;
   private reverb: Tone.Reverb | null = null;
   private vibrato: Tone.Vibrato | null = null;
   private initialized = false;
@@ -33,7 +33,7 @@ class AudioService {
     this.reverb = new Tone.Reverb({ decay: 2.0, wet: 0.3 }).toDestination();
     
     // Create a violin-like synth using sawtooth with filter
-    this.synth = new Tone.PolySynth(Tone.Synth, {
+    this.synth = new Tone.Synth({
       oscillator: { 
         type: 'sawtooth',
       },
@@ -41,7 +41,7 @@ class AudioService {
         attack: 0.1, 
         decay: 0.2, 
         sustain: 0.4, 
-        release: 0.8 
+        release: 0.3 
       },
     }).chain(
       new Tone.Filter({
@@ -61,7 +61,7 @@ class AudioService {
     console.log('🎻 Violin audio initialized!');
   }
 
-  private _setVolumeOnInstrument(inst: Tone.PolySynth) {
+  private _setVolumeOnInstrument(inst: Tone.Synth) {
     inst.volume.value = Tone.gainToDb(this.volume);
   }
 
@@ -84,20 +84,21 @@ class AudioService {
   stopNote(note: string): void {
     if (!this.initialized) return;
     try {
-      this.synth?.triggerRelease(note);
+      this.synth?.triggerRelease();
     } catch {}
   }
 
   playNotes(notes: string[], duration: string = '8n'): void {
-    if (!this.initialized) return;
+    if (!this.initialized || notes.length === 0) return;
     try {
-      this.synth?.triggerAttackRelease(notes, duration);
+      // Monophonic fallback: play the first note
+      this.synth?.triggerAttackRelease(notes[0], duration);
     } catch { /* silent */ }
   }
 
   stopAllNotes(): void {
     if (!this.initialized) return;
-    this.synth?.releaseAll();
+    this.synth?.triggerRelease();
   }
 
   setVolume(value: number): void {
