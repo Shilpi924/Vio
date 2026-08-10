@@ -119,6 +119,8 @@ export default function ParentDashboard() {
     setShowAddProfileModal(false);
   };
 
+  const currentLevel = profile?.level || 1;
+
   const togglePreference = (key: 'soundEffects' | 'showAnimations' | 'darkMode') => {
     if (!profile) return;
     updateProfile({
@@ -147,29 +149,31 @@ export default function ParentDashboard() {
             </p>
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                activeTab === 'overview'
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-                  : 'bg-slate-900 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                activeTab === 'settings'
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-                  : 'bg-slate-900 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Parent Settings
-            </button>
-          </div>
+          {/* Navigation Controls (Unlocked progressively at Level 3) */}
+          {currentLevel >= 3 && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                  activeTab === 'overview'
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                  activeTab === 'settings'
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Parent Settings
+              </button>
+            </div>
+          )}
         </header>
 
         {activeTab === 'overview' ? (
