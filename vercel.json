@@ -1,7 +1,8 @@
 {
+  "outputDirectory": "dist/static",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|.*\\.).*)",
       "destination": "/index.html"
     }
   ]
