@@ -21,6 +21,10 @@ class AudioAnalysisService {
     return this.running;
   }
 
+  getMediaStream(): MediaStream | null {
+    return this.mediaStream;
+  }
+
   async start(callback: FrameCallback): Promise<void> {
     if (this.running) return;
     if (!navigator.mediaDevices?.getUserMedia) {
