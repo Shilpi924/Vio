@@ -38,20 +38,20 @@ class AudioService {
         type: 'sawtooth',
       },
       envelope: { 
-        attack: 0.1, 
-        decay: 0.2, 
-        sustain: 0.4, 
-        release: 0.3 
+        attack: 0.18, 
+        decay: 0.1, 
+        sustain: 0.85, 
+        release: 0.15 
       },
     }).chain(
       new Tone.Filter({
         type: 'lowpass',
-        frequency: 4000,
-        Q: 1
+        frequency: 1800,
+        Q: 0.7
       }),
       this.vibrato = new Tone.Vibrato({
-        frequency: 5,
-        depth: 0.1,
+        frequency: 6,
+        depth: 0.15,
       }),
       this.reverb
     );
